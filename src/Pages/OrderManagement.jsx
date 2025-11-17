@@ -1,11 +1,11 @@
-import OrderStats from '../Component/orderManagement/OrderStats';
-import OrderTable from '../Component/orderManagement/OrderTable';
+import OrderStats from '../components/orderManagement/OrderStats';
+import OrderTable from '../components/orderManagement/OrderTable';
 import { Link } from 'react-router-dom';
 import { FaUpRightFromSquare } from 'react-icons/fa6';
 import { ContextData } from '../DataProvider';
 import { useContext, useState } from 'react';
 import { TbCashRegister } from 'react-icons/tb';
-import WithdrawModal from '../Component/orderManagement/WithdrawModal';
+import WithdrawModal from '../components/orderManagement/WithdrawModal';
 import { Download } from 'lucide-react';
 
 export default function OrderManagement() {

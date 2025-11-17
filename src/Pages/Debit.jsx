@@ -4,9 +4,9 @@ import { format } from 'date-fns';
 import { FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import AddPerson from '../Component/Debit/AddPerson';
-import AddTransaction from '../Component/Debit/AddTransaction';
-import UpdateTransaction from '../Component/Debit/UpdateTransaction';
+import AddPerson from '../components/Debit/AddPerson';
+import AddTransaction from '../components/Debit/AddTransaction';
+import UpdateTransaction from '../components/Debit/UpdateTransaction';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 export default function DebitPage() {
@@ -227,7 +227,7 @@ export default function DebitPage() {
 
             {/* --- Summary --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="stat bg-white !border rounded-lg">
+                <div className="stat bg-white border! rounded-lg">
                     <div className="stat-title text-gray-500 font-semibold">
                         Total Borrowed
                     </div>
@@ -237,7 +237,7 @@ export default function DebitPage() {
                     <div className="stat-desc text-sm">All time</div>
                 </div>
 
-                <div className="stat bg-white !border rounded-lg">
+                <div className="stat bg-white border! rounded-lg">
                     <div className="stat-title text-gray-500 font-semibold">
                         Total Returned
                     </div>
@@ -291,13 +291,13 @@ export default function DebitPage() {
                         placeholder="Search name, phone, or type"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="input !border w-64"
+                        className="input border! w-64"
                     />
                     <input
                         type="date"
                         value={filterDate}
                         onChange={(e) => setFilterDate(e.target.value)}
-                        className="input !border w-auto"
+                        className="input border! w-auto"
                     />
                     {(search || filterDate) && (
                         <button
@@ -308,7 +308,7 @@ export default function DebitPage() {
                         </button>
                     )}
                     <select
-                        className="select !border w-[140px]"
+                        className="select border! w-[140px]"
                         value={perPage}
                         onChange={(e) => {
                             setPerPage(Number(e.target.value));
@@ -329,13 +329,13 @@ export default function DebitPage() {
                 <table className="table w-full text-sm">
                     <thead className="bg-violet-600 text-white">
                         <tr>
-                            <th className="!border">#</th>
-                            <th className="!border">Name</th>
-                            <th className="!border">Phone</th>
-                            <th className="!border">Amount</th>
-                            <th className="!border">Type</th>
-                            <th className="!border">Date</th>
-                            <th className="text-center !border">Actions</th>
+                            <th className="border!">#</th>
+                            <th className="border!">Name</th>
+                            <th className="border!">Phone</th>
+                            <th className="border!">Amount</th>
+                            <th className="border!">Type</th>
+                            <th className="border!">Date</th>
+                            <th className="text-center border!">Actions</th>
                         </tr>
                     </thead>
                     <tbody>

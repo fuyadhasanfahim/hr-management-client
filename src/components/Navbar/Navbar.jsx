@@ -15,7 +15,7 @@ import { RiCurrencyLine, RiUser2Fill } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
 import { ContextData } from '../../DataProvider';
 import { HiDocumentDuplicate } from 'react-icons/hi2';
-import { FileCheck2Icon } from 'lucide-react';
+import { FileCheck2Icon, FileSpreadsheet } from 'lucide-react';
 
 const Navbar = () => {
     const { currentUser } = useContext(ContextData);
@@ -59,13 +59,29 @@ const Navbar = () => {
                 <Link
                     to="/employeeList"
                     className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/employee'
+                        location.pathname.startsWith('/employeeList')
                             ? 'bg-[#6E3FF3] text-white shadow-md'
                             : 'hover:bg-[#6E3FF3] hover:text-white'
                     }`}
                 >
                     <LuUsers />
                     <span>Employee List</span>
+                </Link>
+            )}
+            {/* ************************************************* ********************/}
+            {(currentUser?.role === 'Developer' ||
+                currentUser?.role === 'Admin' ||
+                currentUser?.role === 'HR-ADMIN') && (
+                <Link
+                    to="/salary-sheet"
+                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
+                        location.pathname.startsWith('/salary-sheet')
+                            ? 'bg-[#6E3FF3] text-white shadow-md'
+                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    }`}
+                >
+                    <FileSpreadsheet size={18} />
+                    <span>Salary Sheet</span>
                 </Link>
             )}
             {/* ************************************************* ********************/}
@@ -201,7 +217,7 @@ const Navbar = () => {
                         : 'hover:bg-[#6E3FF3] hover:text-white'
                 }`}
             >
-                <FileCheck2Icon size={20} />
+                <FileCheck2Icon size={18} />
                 <span>Order Management</span>
             </Link>
             {/*************************************************************/}

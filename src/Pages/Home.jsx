@@ -1,9 +1,9 @@
 import { useContext, useEffect } from 'react';
 import { ContextData } from '../DataProvider';
-import AdminDashboard from '../Component/Admin/AdminDashboard';
-import ClientDashboard from '../Component/ClientDashboard/ClientDashboard';
-import HrDashboard from '../Component/HrAdmin/HrDashboard';
-import EmployeeDashboard from '../Component/EmployeeDashboard/EmployeeDashboard';
+import AdminDashboard from '../components/Admin/AdminDashboard';
+import ClientDashboard from '../components/ClientDashboard/ClientDashboard';
+import HrDashboard from '../components/HrAdmin/HrDashboard';
+import EmployeeDashboard from '../components/EmployeeDashboard/EmployeeDashboard';
 import { useNavigate } from 'react-router-dom';
 
 const roleComponentMap = {

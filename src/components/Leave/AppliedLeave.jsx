@@ -69,7 +69,7 @@ const AppliedLeave = () => {
   };
 
   return (
-    <div>
+    <div className='p-4'>
       <section className="flex gap-4 justify-end text-xl">
         <div className="border p-3 rounded font-semibold">
           Total application: {appliedLeaveApplication?.length || 0}
@@ -96,6 +96,7 @@ const AppliedLeave = () => {
                 <th className="w-[5%]">Day&apos;s</th>
                 <th className="w-[10%]">Action</th> {/* ← New Action column */}
                 <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
 

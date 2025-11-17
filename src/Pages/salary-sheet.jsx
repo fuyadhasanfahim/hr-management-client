@@ -1,0 +1,265 @@
+import { useState } from 'react';
+import { SearchIcon, Download, Loader } from 'lucide-react';
+import { useDebouncedCallback } from 'use-debounce';
+import useSalarySheet from '../hooks/useSalarySheet';
+import axios from 'axios';
+import * as XLSX from 'xlsx';
+
+const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
+
+export default function SalarySheetPage() {
+    const [search, setSearch] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [page, setPage] = useState(1);
+    const [rows, setRows] = useState(20);
+    const [exporting, setExporting] = useState(false);
+
+    const debouncedSearch = useDebouncedCallback((value) => {
+        setSearch(value);
+        setPage(1);
+    }, 500);
+
+    const { data, totalPages, loading } = useSalarySheet({
+        search,
+        month: selectedMonth,
+        page,
+        rows,
+    });
+
+    const format = (value) => {
+        const num = Number(value || 0);
+        return num.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+    };
+
+    const exportExcel = async () => {
+        try {
+            setExporting(true);
+
+            const res = await axios.get(
+                `${import.meta.env.VITE_BASE_URL}/salary/get-salary-sheet`,
+                {
+                    params: {
+                        search,
+                        month: selectedMonth,
+                        page: 1,
+                        limit: 999999,
+                    },
+                }
+            );
+
+            const rows = res.data.data;
+
+            const exportData = rows.map((item) => ({
+                Name: item.name,
+                Email: item.email,
+                Salary: item.salary.toFixed(2),
+                'Per Day Salary': item.perDaySalary.toFixed(2),
+                Present: item.presentCount,
+                Absent: item.absentCount,
+                'Total Payable': item.totalPayable.toFixed(2),
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Salary Sheet');
+
+            XLSX.writeFile(wb, 'salary_sheet.xlsx');
+        } catch (error) {
+            console.error(error);
+            alert('Export failed.');
+        } finally {
+            setExporting(false);
+        }
+    };
+
+    return (
+        <div className="p-6 space-y-6">
+            {/* Header with Filters */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-violet-700">
+                    Salary Sheet
+                </h2>
+
+                <div className="flex items-center gap-4">
+                    {/* Search */}
+                    <div className="flex items-center border border-violet-300 rounded-lg px-3 py-1 bg-white shadow-sm">
+                        <SearchIcon size={16} className="text-violet-600" />
+                        <input
+                            type="search"
+                            placeholder="Search..."
+                            className="ml-2 outline-none"
+                            onChange={(e) => debouncedSearch(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Month Select */}
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => {
+                            setSelectedMonth(e.target.value);
+                            setPage(1);
+                        }}
+                        className="border! border-violet-300! rounded-lg px-3 py-1 bg-white shadow-sm"
+                    >
+                        <option value="">Select Month</option>
+                        {monthNames.map((m) => (
+                            <option key={m} value={m}>
+                                {m}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Rows */}
+                    <select
+                        value={rows}
+                        onChange={(e) => {
+                            setRows(e.target.value);
+                            setPage(1);
+                        }}
+                        className="border! border-violet-300! rounded-lg px-3 py-1 bg-white shadow-sm"
+                    >
+                        {[20, 50, 100].map((r) => (
+                            <option key={r} value={r}>
+                                {r}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Export Button */}
+                    <button
+                        onClick={exportExcel}
+                        disabled={exporting}
+                        className="flex items-center gap-2 bg-violet-600 text-white px-4 py-1.5 rounded-lg hover:bg-violet-700 shadow w-full"
+                    >
+                        {exporting ? (
+                            <Loader size={16} />
+                        ) : (
+                            <Download size={16} />
+                        )}
+                        Export Excel
+                    </button>
+                </div>
+            </div>
+
+            {/* Table */}
+            <div className="border border-gray-200 shadow overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                    <thead className="bg-violet-600 text-white">
+                        <tr>
+                            <th className="px-4 py-2">Serial</th>
+                            <th className="px-4 py-2">Name</th>
+                            <th className="px-4 py-2">Email</th>
+                            <th className="px-4 py-2">Salary</th>
+                            <th className="px-4 py-2">Per Day</th>
+                            <th className="px-4 py-2">Present</th>
+                            <th className="px-4 py-2">Absent</th>
+                            <th className="px-4 py-2">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {loading ? (
+                            <tr>
+                                <td
+                                    colSpan="8"
+                                    className="text-center py-6 text-gray-600"
+                                >
+                                    <Loader
+                                        size={16}
+                                        className="animate-spin mx-auto"
+                                    />
+                                </td>
+                            </tr>
+                        ) : data.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan="8"
+                                    className="text-center py-6 text-gray-600"
+                                >
+                                    No data found
+                                </td>
+                            </tr>
+                        ) : (
+                            data.map((row, idx) => (
+                                <tr
+                                    key={idx}
+                                    className="border-b border-gray-100 hover:bg-gray-50 transition"
+                                >
+                                    <td className="px-4 py-2">
+                                        {(page - 1) * rows + idx + 1}
+                                    </td>
+                                    <td className="px-4 py-2">{row.name}</td>
+                                    <td className="px-4 py-2">{row.email}</td>
+                                    <td className="px-4 py-2 text-center">
+                                        {format(row.salary)}
+                                    </td>
+                                    <td className="px-4 py-2 text-center">
+                                        {format(row.perDaySalary)}
+                                    </td>
+                                    <td className="px-4 py-2 text-center">
+                                        {row.presentCount}
+                                    </td>
+                                    <td className="px-4 py-2 text-center">
+                                        {row.absentCount}
+                                    </td>
+                                    <td className="px-4 py-2 text-center font-semibold text-violet-700">
+                                        {format(row.totalPayable)}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Pagination (Modern UI) */}
+            <div className="flex items-center justify-center gap-3 pt-4">
+                <button
+                    onClick={() => page > 1 && setPage(page - 1)}
+                    disabled={page === 1}
+                    className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40 cursor-not-allowed"
+                >
+                    Previous
+                </button>
+
+                {[...Array(totalPages)].map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setPage(i + 1)}
+                        className={`px-3 py-1 border rounded-lg ${
+                            page === i + 1
+                                ? 'bg-violet-600 text-white border-violet-600'
+                                : 'border-violet-300 hover:bg-violet-100'
+                        }`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+
+                <button
+                    onClick={() => page < totalPages && setPage(page + 1)}
+                    disabled={page === totalPages}
+                    className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40 cursor-not-allowed"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
+}

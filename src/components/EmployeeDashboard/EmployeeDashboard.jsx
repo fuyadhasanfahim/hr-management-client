@@ -32,7 +32,9 @@ const EmployeeDashboard = () => {
     const axiosProtect = useAxiosProtect(); // GET
     const axiosSecure = useAxiosSecure(); // POST/PUT/DELETE
 
-    const { user, attendanceInfo, salaryAndPF } = useContext(ContextData);
+    const { user, attendanceInfo, salaryAndPF, currentUser } =
+        useContext(ContextData);
+    console.log(salaryAndPF);
     const dispatch = useDispatch();
     const refetch = useSelector((state) => state.refetch.refetch);
     const navigate = useNavigate();
@@ -67,7 +69,6 @@ const EmployeeDashboard = () => {
     const [shiftedEmployees, setShiftedEmployees] = useState([]); // /gethShiftedEmployee
     const [notifications, setNotifications] = useState([]); // /getEmployeeNotification
 
-    console.log(checkIn, checkOut);
     // ---------------- Live clock ----------------
     useEffect(() => {
         const t = setInterval(() => {
@@ -85,10 +86,7 @@ const EmployeeDashboard = () => {
         return () => clearInterval(t);
     }, []);
 
-    const todayStr = useMemo(
-        () => moment(new Date()).format('YYYY-MM-DD'),
-        []
-    );
+    const todayStr = useMemo(() => moment(new Date()).format('YYYY-MM-DD'), []);
     const monthName = moment().format('MMMM');
 
     // ---------------- Fetch: profile ----------------

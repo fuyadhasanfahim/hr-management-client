@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import { useDispatch, useSelector } from 'react-redux';
 import useAxiosSecure from '../utils/useAxiosSecure';
 import moment from 'moment';
-import ExpenseModal from '../Component/Modal/ExpenseModal';
+import ExpenseModal from '../components/Modal/ExpenseModal';
 import { toast } from 'react-toastify';
 import { selectPresentUser } from '../redux/userSlice';
 import { selectUserName } from '../redux/userNameSlice';
@@ -409,12 +409,8 @@ const Expense = () => {
                                         {['dhaka', 'gaibandha'].map(
                                             (category) => (
                                                 <option
-                                                    key={
-                                                        category
-                                                    }
-                                                    value={
-                                                        category
-                                                    }
+                                                    key={category}
+                                                    value={category}
                                                 >
                                                     {category}
                                                 </option>

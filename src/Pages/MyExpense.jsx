@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import ExpenseStats from '../Component/expenses/ExpenseStats';
-import ExpenseTable from '../Component/expenses/ExpenseTable';
+import ExpenseStats from '../components/expenses/ExpenseStats';
+import ExpenseTable from '../components/expenses/ExpenseTable';
 import moment from 'moment';
 import { FaPlus } from 'react-icons/fa';
 

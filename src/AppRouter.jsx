@@ -1,41 +1,42 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Root from './Root';
-import NotFound from './Component/NotFound/NotFound';
-import Protected from './Component/Protected/Protected';
+import NotFound from './components/NotFound/NotFound';
+import Protected from './components/Protected/Protected';
 import Home from './Pages/Home';
-import Login from './Component/Login/Login';
-import RecentOrders from './Component/Admin/RecentOrders';
+import Login from './components/Login/Login';
+import RecentOrders from './components/Admin/RecentOrders';
 import Settings from './Pages/Settings';
-import CreateLocalOrder from './Component/Admin/CreateLocalOrder';
+import CreateLocalOrder from './components/Admin/CreateLocalOrder';
 import MyExpense from './Pages/MyExpense';
 import OrderManagement from './Pages/OrderManagement';
-import ViewLocalOrder from './Component/Admin/ViewLocalOrder';
-import Clients from './Component/ClientList/Clients';
-import EmployeeSignUp from './Component/EmployeeList/EmployeeSignUp';
-import Earnings from './Component/Earnings/Earnings';
-import ProtectedRole from './Component/Protected/ProtectedRole';
-import ResetPassword from './Component/Login/ResetPassword';
-import EmployeeList from './Component/EmployeeList/EmployeeList';
-import Profile from './Component/Common/Profile';
-import Analytics from './Component/Analytics/Analytics';
-import EditEarnings from './Component/Earnings/EditEarnings';
-import ProtectHr from './Component/Protected/ProtectHr';
-import ProfitShare from './Component/ProfitShare/ProfitShare';
-import ProtectedEmployee from './Component/Protected/ProtectedEmployee';
-import ShareholderDetails from './Component/ProfitShare/ShareholderDetails';
-import Payroll from './Component/Payroll/Payroll';
-import LeaveApplication from './Component/Leave/LeaveApplication';
-import AppliedLeave from './Component/Leave/AppliedLeave';
-import EmployeeDetails from './Component/Payroll/EmployeeDetails';
-import Shifting from './Component/EmployeeList/Shifting';
-import EmployeeProfile from './Component/EmployeeList/EmployeeProfile';
-import NoticeBoardAdmin from './Component/NoticeBoard/NoticeBoardAdmin';
-import NoticeBoard from './Component/NoticeBoard/NoticeBoard';
+import ViewLocalOrder from './components/Admin/ViewLocalOrder';
+import Clients from './components/ClientList/Clients';
+import EmployeeSignUp from './components/EmployeeList/EmployeeSignUp';
+import Earnings from './components/Earnings/Earnings';
+import ProtectedRole from './components/Protected/ProtectedRole';
+import ResetPassword from './components/Login/ResetPassword';
+import EmployeeList from './components/EmployeeList/EmployeeList';
+import Profile from './components/Common/Profile';
+import Analytics from './components/Analytics/Analytics';
+import EditEarnings from './components/Earnings/EditEarnings';
+import ProtectHr from './components/Protected/ProtectHr';
+import ProfitShare from './components/ProfitShare/ProfitShare';
+import ProtectedEmployee from './components/Protected/ProtectedEmployee';
+import ShareholderDetails from './components/ProfitShare/ShareholderDetails';
+import Payroll from './components/Payroll/Payroll';
+import LeaveApplication from './components/Leave/LeaveApplication';
+import AppliedLeave from './components/Leave/AppliedLeave';
+import EmployeeDetails from './components/Payroll/EmployeeDetails';
+import Shifting from './components/EmployeeList/Shifting';
+import EmployeeProfile from './components/EmployeeList/EmployeeProfile';
+import NoticeBoardAdmin from './components/NoticeBoard/NoticeBoardAdmin';
+import NoticeBoard from './components/NoticeBoard/NoticeBoard';
 import DebitPage from './Pages/Debit';
-import ClientDetails from './Component/ClientDetails/ClientDetails';
+import ClientDetails from './components/ClientDetails/ClientDetails';
 import ExportInvoice from './Pages/ExportInvoice';
 import CreatePassword from './Pages/CreatePassword';
 import CompleteProfile from './Pages/CompleteProfile';
+import SalarySheetPage from './Pages/salary-sheet';
 
 export const router = createBrowserRouter([
     { path: '/login', element: <Login /> },
@@ -109,6 +110,14 @@ export const router = createBrowserRouter([
                 element: (
                     <ProtectedRole>
                         <EmployeeList />
+                    </ProtectedRole>
+                ),
+            },
+            {
+                path: '/salary-sheet',
+                element: (
+                    <ProtectedRole>
+                        <SalarySheetPage />
                     </ProtectedRole>
                 ),
             },
