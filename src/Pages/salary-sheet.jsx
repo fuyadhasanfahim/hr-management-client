@@ -4,6 +4,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import useSalarySheet from '../hooks/useSalarySheet';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import { toast } from 'react-toastify';
 
 const monthNames = [
     'January',
@@ -28,6 +29,10 @@ export default function SalarySheetPage() {
     const [exporting, setExporting] = useState(false);
 
     const debouncedSearch = useDebouncedCallback((value) => {
+        if (!selectedMonth) {
+            toast.warning('Please select a month before searching.');
+            return;
+        }
         setSearch(value);
         setPage(1);
     }, 500);
@@ -48,6 +53,11 @@ export default function SalarySheetPage() {
     };
 
     const exportExcel = async () => {
+        if (!selectedMonth) {
+            toast.warning('Please select a month before exporting.');
+            return;
+        }
+
         try {
             setExporting(true);
 
@@ -68,11 +78,11 @@ export default function SalarySheetPage() {
             const exportData = rows.map((item) => ({
                 Name: item.name,
                 Email: item.email,
-                Salary: item.salary.toFixed(2),
-                'Per Day Salary': item.perDaySalary.toFixed(2),
+                Salary: Number(item.salary).toFixed(2),
+                'Per Day Salary': Number(item.perDaySalary).toFixed(2),
                 Present: item.presentCount,
                 Absent: item.absentCount,
-                'Total Payable': item.totalPayable.toFixed(2),
+                'Total Payable': Number(item.totalPayable).toFixed(2),
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
@@ -80,9 +90,11 @@ export default function SalarySheetPage() {
             XLSX.utils.book_append_sheet(wb, ws, 'Salary Sheet');
 
             XLSX.writeFile(wb, 'salary_sheet.xlsx');
+
+            toast.success('Excel exported successfully!');
         } catch (error) {
             console.error(error);
-            alert('Export failed.');
+            toast.error('Export failed.');
         } finally {
             setExporting(false);
         }
@@ -108,16 +120,16 @@ export default function SalarySheetPage() {
                         />
                     </div>
 
-                    {/* Month Select */}
+                    {/* Month Select (REQUIRED) */}
                     <select
                         value={selectedMonth}
                         onChange={(e) => {
                             setSelectedMonth(e.target.value);
                             setPage(1);
                         }}
-                        className="border! border-violet-300! rounded-lg px-3 py-1 bg-white shadow-sm"
+                        className="border border-violet-300 rounded-lg px-3 py-1 bg-white shadow-sm"
                     >
-                        <option value="">Select Month</option>
+                        <option value="">Select Month (Required)</option>
                         {monthNames.map((m) => (
                             <option key={m} value={m}>
                                 {m}
@@ -129,10 +141,10 @@ export default function SalarySheetPage() {
                     <select
                         value={rows}
                         onChange={(e) => {
-                            setRows(e.target.value);
+                            setRows(Number(e.target.value));
                             setPage(1);
                         }}
-                        className="border! border-violet-300! rounded-lg px-3 py-1 bg-white shadow-sm"
+                        className="border border-violet-300 rounded-lg px-3 py-1 bg-white shadow-sm"
                     >
                         {[20, 50, 100].map((r) => (
                             <option key={r} value={r}>
@@ -144,11 +156,17 @@ export default function SalarySheetPage() {
                     {/* Export Button */}
                     <button
                         onClick={exportExcel}
-                        disabled={exporting}
-                        className="flex items-center gap-2 bg-violet-600 text-white px-4 py-1.5 rounded-lg hover:bg-violet-700 shadow w-full"
+                        disabled={exporting || !selectedMonth}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg shadow
+                            ${
+                                !selectedMonth
+                                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                    : 'bg-violet-600 hover:bg-violet-700 text-white'
+                            }
+                        `}
                     >
                         {exporting ? (
-                            <Loader size={16} />
+                            <Loader size={16} className="animate-spin" />
                         ) : (
                             <Download size={16} />
                         )}
@@ -159,107 +177,119 @@ export default function SalarySheetPage() {
 
             {/* Table */}
             <div className="border border-gray-200 shadow overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
-                    <thead className="bg-violet-600 text-white">
-                        <tr>
-                            <th className="px-4 py-2">Serial</th>
-                            <th className="px-4 py-2">Name</th>
-                            <th className="px-4 py-2">Email</th>
-                            <th className="px-4 py-2">Salary</th>
-                            <th className="px-4 py-2">Per Day</th>
-                            <th className="px-4 py-2">Present</th>
-                            <th className="px-4 py-2">Absent</th>
-                            <th className="px-4 py-2">Total</th>
-                        </tr>
-                    </thead>
+                {selectedMonth === '' ? (
+                    <div className="text-center text-gray-600 py-10">
+                        Please select a month to view salary sheet.
+                    </div>
+                ) : (
+                    <table className="min-w-full text-left text-sm">
+                        <thead className="bg-violet-600 text-white">
+                            <tr>
+                                <th className="px-4 py-2">Serial</th>
+                                <th className="px-4 py-2">Name</th>
+                                <th className="px-4 py-2">Email</th>
+                                <th className="px-4 py-2">Salary</th>
+                                <th className="px-4 py-2">Per Day</th>
+                                <th className="px-4 py-2">Present</th>
+                                <th className="px-4 py-2">Absent</th>
+                                <th className="px-4 py-2">Total</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td
-                                    colSpan="8"
-                                    className="text-center py-6 text-gray-600"
-                                >
-                                    <Loader
-                                        size={16}
-                                        className="animate-spin mx-auto"
-                                    />
-                                </td>
-                            </tr>
-                        ) : data.length === 0 ? (
-                            <tr>
-                                <td
-                                    colSpan="8"
-                                    className="text-center py-6 text-gray-600"
-                                >
-                                    No data found
-                                </td>
-                            </tr>
-                        ) : (
-                            data.map((row, idx) => (
-                                <tr
-                                    key={idx}
-                                    className="border-b border-gray-100 hover:bg-gray-50 transition"
-                                >
-                                    <td className="px-4 py-2">
-                                        {(page - 1) * rows + idx + 1}
-                                    </td>
-                                    <td className="px-4 py-2">{row.name}</td>
-                                    <td className="px-4 py-2">{row.email}</td>
-                                    <td className="px-4 py-2 text-center">
-                                        {format(row.salary)}
-                                    </td>
-                                    <td className="px-4 py-2 text-center">
-                                        {format(row.perDaySalary)}
-                                    </td>
-                                    <td className="px-4 py-2 text-center">
-                                        {row.presentCount}
-                                    </td>
-                                    <td className="px-4 py-2 text-center">
-                                        {row.absentCount}
-                                    </td>
-                                    <td className="px-4 py-2 text-center font-semibold text-violet-700">
-                                        {format(row.totalPayable)}
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td
+                                        colSpan="8"
+                                        className="text-center py-6"
+                                    >
+                                        <Loader
+                                            size={20}
+                                            className="animate-spin mx-auto"
+                                        />
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ) : data.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan="8"
+                                        className="text-center py-6 text-gray-600"
+                                    >
+                                        No data found
+                                    </td>
+                                </tr>
+                            ) : (
+                                data.map((row, idx) => (
+                                    <tr
+                                        key={idx}
+                                        className="border-b border-gray-100 hover:bg-gray-50 transition"
+                                    >
+                                        <td className="px-4 py-2">
+                                            {(page - 1) * rows + idx + 1}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {row.name}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {row.email}
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {format(row.salary)}
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {format(row.perDaySalary)}
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {row.presentCount}
+                                        </td>
+                                        <td className="px-4 py-2 text-center">
+                                            {row.absentCount}
+                                        </td>
+                                        <td className="px-4 py-2 text-center font-semibold text-violet-700">
+                                            {format(row.totalPayable)}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                )}
             </div>
 
-            {/* Pagination (Modern UI) */}
-            <div className="flex items-center justify-center gap-3 pt-4">
-                <button
-                    onClick={() => page > 1 && setPage(page - 1)}
-                    disabled={page === 1}
-                    className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40 cursor-not-allowed"
-                >
-                    Previous
-                </button>
-
-                {[...Array(totalPages)].map((_, i) => (
+            {/* Pagination */}
+            {selectedMonth && (
+                <div className="flex items-center justify-center gap-3 pt-4">
                     <button
-                        key={i}
-                        onClick={() => setPage(i + 1)}
-                        className={`px-3 py-1 border rounded-lg ${
-                            page === i + 1
-                                ? 'bg-violet-600 text-white border-violet-600'
-                                : 'border-violet-300 hover:bg-violet-100'
-                        }`}
+                        onClick={() => page > 1 && setPage(page - 1)}
+                        disabled={page === 1}
+                        className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40"
                     >
-                        {i + 1}
+                        Previous
                     </button>
-                ))}
 
-                <button
-                    onClick={() => page < totalPages && setPage(page + 1)}
-                    disabled={page === totalPages}
-                    className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40 cursor-not-allowed"
-                >
-                    Next
-                </button>
-            </div>
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setPage(i + 1)}
+                            className={`px-3 py-1 border rounded-lg ${
+                                page === i + 1
+                                    ? 'bg-violet-600 text-white border-violet-600'
+                                    : 'border-violet-300 hover:bg-violet-100'
+                            }`}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+
+                    <button
+                        onClick={() => page < totalPages && setPage(page + 1)}
+                        disabled={page === totalPages}
+                        className="px-4 py-1 border border-violet-300 rounded-lg hover:bg-violet-100 disabled:opacity-40"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
