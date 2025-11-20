@@ -88,6 +88,7 @@ const LeaveApplication = () => {
                 '/appliedLeave',
                 updatedData
             );
+            console.log(response)
             if (response.data.message === 'success') {
                 dispatch(setRefetch(!refetch));
                 toast.success('Leave request submitted successfully');

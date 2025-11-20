@@ -15,9 +15,30 @@ export default function NewShiftModal({ refetch }) {
         lateAfterMinutes: 0,
         absentAfterMinutes: 5,
         allowOT: true,
+        weekends: [], // NEW FIELD
     });
+
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+
+    const weekendOptions = [
+        'Friday',
+        'Saturday',
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+    ];
+
+    const toggleWeekend = (day) => {
+        setForm((prev) => ({
+            ...prev,
+            weekends: prev.weekends.includes(day)
+                ? prev.weekends.filter((d) => d !== day)
+                : [...prev.weekends, day],
+        }));
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -59,6 +80,7 @@ export default function NewShiftModal({ refetch }) {
                     lateAfterMinutes: 0,
                     absentAfterMinutes: 5,
                     allowOT: true,
+                    weekends: [],
                 });
 
                 const modal = document.getElementById('new-shift-modal');
@@ -85,9 +107,7 @@ export default function NewShiftModal({ refetch }) {
                     {/* Shift Name */}
                     <div>
                         <label className="label">
-                            <span className="label-text" disabled>
-                                Shift Name
-                            </span>
+                            <span className="label-text">Shift Name</span>
                         </label>
                         <input
                             type="text"
@@ -95,8 +115,8 @@ export default function NewShiftModal({ refetch }) {
                             value={form.shiftName}
                             onChange={handleChange}
                             required
-                            placeholder="e.g. Morning"
-                            className="input border! border-primary! w-full"
+                            placeholder="e.g. Morning Shift"
+                            className="input border! w-full"
                         />
                     </div>
 
@@ -109,12 +129,8 @@ export default function NewShiftModal({ refetch }) {
                             name="branch"
                             value={form.branch}
                             onChange={handleChange}
-                            required
-                            className="select border! border-primary! w-full capitalize"
+                            className="select border! w-full capitalize"
                         >
-                            <option value="" disabled>
-                                Select Branch
-                            </option>
                             {['dhaka', 'gaibandha'].map((branch) => (
                                 <option key={branch} value={branch}>
                                     {branch}
@@ -123,7 +139,7 @@ export default function NewShiftModal({ refetch }) {
                         </select>
                     </div>
 
-                    {/* Start Time / End Time */}
+                    {/* Start / End Time */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="label">
@@ -135,7 +151,7 @@ export default function NewShiftModal({ refetch }) {
                                 value={form.startTime}
                                 onChange={handleChange}
                                 required
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
 
@@ -149,12 +165,12 @@ export default function NewShiftModal({ refetch }) {
                                 value={form.endTime}
                                 onChange={handleChange}
                                 required
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
                     </div>
 
-                    {/* Late & Absent thresholds */}
+                    {/* Late & Absent */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="label">
@@ -168,7 +184,7 @@ export default function NewShiftModal({ refetch }) {
                                 value={form.lateAfterMinutes}
                                 onChange={handleChange}
                                 min="0"
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
 
@@ -184,7 +200,7 @@ export default function NewShiftModal({ refetch }) {
                                 value={form.absentAfterMinutes}
                                 onChange={handleChange}
                                 min="1"
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
                     </div>
@@ -196,9 +212,40 @@ export default function NewShiftModal({ refetch }) {
                             name="allowOT"
                             checked={form.allowOT}
                             onChange={handleChange}
-                            className="checkbox border! border-primary!"
+                            className="checkbox checkbox-primary"
                         />
                         <span className="label-text">Allow Overtime</span>
+                    </div>
+
+                    {/* Weekends */}
+                    <div>
+                        <label className="label">
+                            <span className="label-text">Weekend Days</span>
+                        </label>
+
+                        <div className="flex flex-wrap gap-3">
+                            {weekendOptions.map((day) => {
+                                const selected = form.weekends.includes(day);
+
+                                return (
+                                    <button
+                                        type="button"
+                                        key={day}
+                                        onClick={() => toggleWeekend(day)}
+                                        className={`
+                                            px-3 py-1 rounded-lg border text-sm transition-all
+                                            ${
+                                                selected
+                                                    ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-[1.05]'
+                                                    : 'bg-white text-gray-800 border-gray-400 hover:bg-gray-100'
+                                            }
+                                        `}
+                                    >
+                                        {day}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Actions */}
@@ -217,7 +264,7 @@ export default function NewShiftModal({ refetch }) {
                                     .getElementById('new-shift-modal')
                                     .close()
                             }
-                            className="btn btn-ghost"
+                            className="btn btn-outline"
                         >
                             Cancel
                         </button>

@@ -8,6 +8,7 @@ import { ContextData } from '../../DataProvider';
 
 export default function ShiftCard({ shift, refetch }) {
     const { user } = useContext(ContextData);
+    const dispatch = useDispatch();
 
     const {
         shiftName,
@@ -19,10 +20,11 @@ export default function ShiftCard({ shift, refetch }) {
         allowOT,
     } = shift;
 
-    const dispatch = useDispatch();
+    // Unique modal ID for each shift
+    const modalId = `edit-shift-modal-${shift._id}`;
 
     const onEdit = () => {
-        document.getElementById('edit-shift-modal').showModal();
+        document.getElementById(modalId).showModal();
     };
 
     const onDelete = async () => {
@@ -66,7 +68,7 @@ export default function ShiftCard({ shift, refetch }) {
                 <div className="flex items-center justify-between">
                     <h2 className="card-title">{shiftName}</h2>
                     <div
-                        className={`badge badge-soft ${
+                        className={`badge ${
                             allowOT ? 'badge-success' : 'badge-error'
                         } capitalize`}
                     >
@@ -115,7 +117,8 @@ export default function ShiftCard({ shift, refetch }) {
                     </button>
                 </div>
             </div>
-            <EditShiftModal refetch={refetch} data={shift} />
+
+            <EditShiftModal modalId={modalId} refetch={refetch} data={shift} />
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { ContextData } from '../../DataProvider';
 import { useDispatch } from 'react-redux';
 import { setRefetch } from '../../redux/refetchSlice';
 
-export default function EditShiftModal({ refetch, data }) {
+export default function EditShiftModal({ refetch, data, modalId }) {
     const { user } = useContext(ContextData);
     const dispatch = useDispatch();
 
@@ -17,11 +17,21 @@ export default function EditShiftModal({ refetch, data }) {
         lateAfterMinutes: 0,
         absentAfterMinutes: 5,
         allowOT: true,
+        weekends: [],
     });
 
     const [loading, setLoading] = useState(false);
 
-    // Load data when modal opens
+    const weekendOptions = [
+        'Friday',
+        'Saturday',
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+    ];
+
     useEffect(() => {
         if (data) {
             setForm({
@@ -33,6 +43,7 @@ export default function EditShiftModal({ refetch, data }) {
                 lateAfterMinutes: data.lateAfterMinutes,
                 absentAfterMinutes: data.absentAfterMinutes,
                 allowOT: data.allowOT,
+                weekends: data.weekends || [],
             });
         }
     }, [data]);
@@ -42,6 +53,15 @@ export default function EditShiftModal({ refetch, data }) {
         setForm((prev) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
+        }));
+    };
+
+    const toggleWeekend = (day) => {
+        setForm((prev) => ({
+            ...prev,
+            weekends: prev.weekends.includes(day)
+                ? prev.weekends.filter((d) => d !== day)
+                : [...prev.weekends, day],
         }));
     };
 
@@ -71,8 +91,7 @@ export default function EditShiftModal({ refetch, data }) {
                     responseData?.message || 'Shift updated successfully'
                 );
 
-                const modal = document.getElementById('edit-shift-modal');
-                if (modal && typeof modal.close === 'function') modal.close();
+                document.getElementById(modalId)?.close();
 
                 dispatch(setRefetch(!refetch));
             } else {
@@ -87,7 +106,7 @@ export default function EditShiftModal({ refetch, data }) {
     };
 
     return (
-        <dialog id="edit-shift-modal" className="modal">
+        <dialog id={modalId} className="modal">
             <div className="modal-box max-w-md">
                 <h3 className="font-bold text-lg mb-4">Update Shift</h3>
 
@@ -103,7 +122,7 @@ export default function EditShiftModal({ refetch, data }) {
                             value={form.shiftName}
                             onChange={handleChange}
                             required
-                            className="input border! border-primary! w-full"
+                            className="input border! w-full"
                         />
                     </div>
 
@@ -117,11 +136,8 @@ export default function EditShiftModal({ refetch, data }) {
                             value={form.branch}
                             onChange={handleChange}
                             required
-                            className="select border! border-primary! w-full capitalize"
+                            className="select border! w-full capitalize"
                         >
-                            <option value="" disabled>
-                                Select Branch
-                            </option>
                             {['dhaka', 'gaibandha'].map((branch) => (
                                 <option key={branch} value={branch}>
                                     {branch}
@@ -142,7 +158,7 @@ export default function EditShiftModal({ refetch, data }) {
                                 value={form.startTime}
                                 onChange={handleChange}
                                 required
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
 
@@ -156,7 +172,7 @@ export default function EditShiftModal({ refetch, data }) {
                                 value={form.endTime}
                                 onChange={handleChange}
                                 required
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
                     </div>
@@ -175,7 +191,7 @@ export default function EditShiftModal({ refetch, data }) {
                                 value={form.lateAfterMinutes}
                                 onChange={handleChange}
                                 min="0"
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
 
@@ -191,7 +207,7 @@ export default function EditShiftModal({ refetch, data }) {
                                 value={form.absentAfterMinutes}
                                 onChange={handleChange}
                                 min="1"
-                                className="input border! border-primary! w-full"
+                                className="input border! w-full"
                             />
                         </div>
                     </div>
@@ -203,9 +219,40 @@ export default function EditShiftModal({ refetch, data }) {
                             name="allowOT"
                             checked={form.allowOT}
                             onChange={handleChange}
-                            className="checkbox border! border-primary!"
+                            className="checkbox checkbox-primary"
                         />
                         <span className="label-text">Allow Overtime</span>
+                    </div>
+
+                    {/* WEEKENDS */}
+                    <div>
+                        <label className="label">
+                            <span className="label-text">Weekend Days</span>
+                        </label>
+
+                        <div className="flex flex-wrap gap-3">
+                            {weekendOptions.map((day) => {
+                                const selected = form.weekends.includes(day);
+
+                                return (
+                                    <button
+                                        type="button"
+                                        key={day}
+                                        onClick={() => toggleWeekend(day)}
+                                        className={`
+                                            px-3 py-1 rounded-lg border text-sm transition-all
+                                            ${
+                                                selected
+                                                    ? 'bg-purple-600 text-white border-purple-700 shadow-md scale-[1.05]'
+                                                    : 'bg-white text-gray-800 border-gray-400 hover:bg-gray-100'
+                                            }
+                                        `}
+                                    >
+                                        {day}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Actions */}
@@ -222,9 +269,7 @@ export default function EditShiftModal({ refetch, data }) {
                             type="button"
                             className="btn btn-soft"
                             onClick={() =>
-                                document
-                                    .getElementById('edit-shift-modal')
-                                    ?.close()
+                                document.getElementById(modalId)?.close()
                             }
                         >
                             Cancel

@@ -33,11 +33,16 @@ export default function SalarySheetPage() {
             toast.warning('Please select a month before searching.');
             return;
         }
+        // update immediate search state used by hook
         setSearch(value);
         setPage(1);
     }, 500);
 
-    const { data, totalPages, loading } = useSalarySheet({
+    const {
+        data = [],
+        totalPages = 0,
+        loading = false,
+    } = useSalarySheet({
         search,
         month: selectedMonth,
         page,
@@ -73,23 +78,28 @@ export default function SalarySheetPage() {
                 }
             );
 
-            const rows = res.data.data;
+            const rowsData = Array.isArray(res.data.data) ? res.data.data : [];
 
-            const exportData = rows.map((item) => ({
-                Name: item.name,
-                Email: item.email,
-                Salary: Number(item.salary).toFixed(2),
-                'Per Day Salary': Number(item.perDaySalary).toFixed(2),
-                Present: item.presentCount,
-                Absent: item.absentCount,
-                'Total Payable': Number(item.totalPayable).toFixed(2),
+            const exportData = rowsData.map((item) => ({
+                Name: item.name || '',
+                Email: item.email || '',
+                'Account Number': item.accountNumber || '',
+                Salary: Number(item.salary || 0).toFixed(2),
+                'Per Day Salary': Number(item.perDaySalary || 0).toFixed(2),
+                Present: item.present ?? 0,
+                Absent: item.absent ?? 0,
+                'Total Payable': Number(item.total || 0).toFixed(2),
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Salary Sheet');
 
-            XLSX.writeFile(wb, 'salary_sheet.xlsx');
+            // Filename with month and year
+            const fileName = `salary_sheet_${selectedMonth
+                .replace(/\s+/g, '_')
+                .toLowerCase()}_${new Date().getFullYear()}.xlsx`;
+            XLSX.writeFile(wb, fileName);
 
             toast.success('Excel exported successfully!');
         } catch (error) {
@@ -114,7 +124,7 @@ export default function SalarySheetPage() {
                         <SearchIcon size={16} className="text-violet-600" />
                         <input
                             type="search"
-                            placeholder="Search..."
+                            placeholder="Search by name or email..."
                             className="ml-2 outline-none"
                             onChange={(e) => debouncedSearch(e.target.value)}
                         />
@@ -126,6 +136,7 @@ export default function SalarySheetPage() {
                         onChange={(e) => {
                             setSelectedMonth(e.target.value);
                             setPage(1);
+                            // clear search state when month changes? keep search
                         }}
                         className="border border-violet-300 rounded-lg px-3 py-1 bg-white shadow-sm"
                     >
@@ -188,6 +199,7 @@ export default function SalarySheetPage() {
                                 <th className="px-4 py-2">Serial</th>
                                 <th className="px-4 py-2">Name</th>
                                 <th className="px-4 py-2">Email</th>
+                                <th className="px-4 py-2">Account No.</th>
                                 <th className="px-4 py-2">Salary</th>
                                 <th className="px-4 py-2">Per Day</th>
                                 <th className="px-4 py-2">Present</th>
@@ -200,7 +212,7 @@ export default function SalarySheetPage() {
                             {loading ? (
                                 <tr>
                                     <td
-                                        colSpan="8"
+                                        colSpan="9"
                                         className="text-center py-6"
                                     >
                                         <Loader
@@ -212,7 +224,7 @@ export default function SalarySheetPage() {
                             ) : data.length === 0 ? (
                                 <tr>
                                     <td
-                                        colSpan="8"
+                                        colSpan="9"
                                         className="text-center py-6 text-gray-600"
                                     >
                                         No data found
@@ -221,7 +233,7 @@ export default function SalarySheetPage() {
                             ) : (
                                 data.map((row, idx) => (
                                     <tr
-                                        key={idx}
+                                        key={row.email ?? idx}
                                         className="border-b border-gray-100 hover:bg-gray-50 transition"
                                     >
                                         <td className="px-4 py-2">
@@ -233,6 +245,9 @@ export default function SalarySheetPage() {
                                         <td className="px-4 py-2">
                                             {row.email}
                                         </td>
+                                        <td className="px-4 py-2">
+                                            {row.accountNumber || '-'}
+                                        </td>
                                         <td className="px-4 py-2 text-center">
                                             {format(row.salary)}
                                         </td>
@@ -240,13 +255,13 @@ export default function SalarySheetPage() {
                                             {format(row.perDaySalary)}
                                         </td>
                                         <td className="px-4 py-2 text-center">
-                                            {row.presentCount}
+                                            {row.present ?? 0}
                                         </td>
                                         <td className="px-4 py-2 text-center">
-                                            {row.absentCount}
+                                            {row.absent ?? 0}
                                         </td>
                                         <td className="px-4 py-2 text-center font-semibold text-violet-700">
-                                            {format(row.totalPayable)}
+                                            {format(row.total)}
                                         </td>
                                     </tr>
                                 ))
@@ -257,8 +272,8 @@ export default function SalarySheetPage() {
             </div>
 
             {/* Pagination */}
-            {selectedMonth && (
-                <div className="flex items-center justify-center gap-3 pt-4">
+            {selectedMonth && totalPages > 0 && (
+                <div className="flex items-center justify-center gap-3 pt-4 flex-wrap">
                     <button
                         onClick={() => page > 1 && setPage(page - 1)}
                         disabled={page === 1}
@@ -271,7 +286,7 @@ export default function SalarySheetPage() {
                         <button
                             key={i}
                             onClick={() => setPage(i + 1)}
-                            className={`px-3 py-1 border rounded-lg ${
+                            className={`px-3 py-1 border rounded-lg m-1 ${
                                 page === i + 1
                                     ? 'bg-violet-600 text-white border-violet-600'
                                     : 'border-violet-300 hover:bg-violet-100'
