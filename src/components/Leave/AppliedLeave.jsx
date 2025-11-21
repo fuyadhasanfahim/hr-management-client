@@ -8,6 +8,7 @@ import { setRefetch } from '../../redux/refetchSlice';
 import Swal from 'sweetalert2';
 
 import { FiCheck, FiEye, FiX } from 'react-icons/fi';
+import { format } from 'date-fns';
 
 const AppliedLeave = () => {
     const { user } = useContext(ContextData);
@@ -234,6 +235,7 @@ const AppliedLeave = () => {
                                 <th>Start</th>
                                 <th>End</th>
                                 <th>Day's</th>
+                                <th>Applied Date</th>
                                 <th>Action</th>
                                 <th>Status</th>
                             </tr>
@@ -258,6 +260,12 @@ const AppliedLeave = () => {
                                             <td>{leave.startDate}</td>
                                             <td>{leave.endDate}</td>
                                             <td>{leave.totalDays}</td>
+                                            <td>
+                                                {format(
+                                                    new Date(leave.appliedDate),
+                                                    'PPP'
+                                                )}
+                                            </td>
 
                                             <td>
                                                 <div className="flex items-center gap-3">

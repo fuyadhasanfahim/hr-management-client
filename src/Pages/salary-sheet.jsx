@@ -252,9 +252,24 @@ export default function SalarySheetPage() {
                     ],
                 ],
                 body: tableRows,
-                showHead: 'firstPage', // ✔ header only on first page
-                styles: { fontSize: 9 },
-                headStyles: { fillColor: '#f1f1f1' },
+                showHead: 'firstPage',
+                theme: 'grid',
+                styles: {
+                    fontSize: 9,
+                    lineWidth: 0.5, // body border width
+                    lineColor: [0, 0, 0], // body border color
+                },
+                headStyles: {
+                    fillColor: [245, 245, 245],
+                    textColor: [0, 0, 0],
+                    halign: 'center',
+                    valign: 'middle',
+                    fontStyle: 'bold',
+
+                    // ⬇⬇ ADD THESE TWO FOR BORDER ON HEADER ⬇⬇
+                    lineWidth: 0.5,
+                    lineColor: [0, 0, 0],
+                },
                 margin: { left: 40, right: 40 },
             });
 
