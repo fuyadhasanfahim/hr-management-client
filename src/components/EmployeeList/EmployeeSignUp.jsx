@@ -42,6 +42,7 @@ const AdminAddEmployee = () => {
             eid: '',
             salary: '',
             role: 'employee',
+            branch: 'dhaka',
         });
     };
 
@@ -82,6 +83,7 @@ const AdminAddEmployee = () => {
             eid: form.eid.trim(),
             salary: Number(form.salary),
             role: form.role,
+            branch: form.branch,
         };
 
         setLoading(true);
