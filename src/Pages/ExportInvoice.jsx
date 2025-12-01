@@ -347,11 +347,9 @@ export default function ExportInvoice() {
                 const total = parseFloat(o.orderPrice) || 0;
                 const perImage = qty > 0 ? total / qty : 0;
 
-                const parsedDate = parse(o.date, 'dd-MMM-yyyy', new Date());
-
                 return [
                     i + 1,
-                    format(parsedDate, 'PPP'),
+                    format(new Date(o.date), 'PPP'),
                     o.orderName,
                     qty,
                     `${currencySymbol}${perImage.toFixed(2)}`,
@@ -572,16 +570,7 @@ export default function ExportInvoice() {
                                             className="checkbox checkbox-sm border-2! border-violet-600!"
                                         />
                                     </td>
-                                    <td>
-                                        {format(
-                                            parse(
-                                                o.date,
-                                                'dd-MMM-yyyy',
-                                                new Date()
-                                            ),
-                                            'PPP'
-                                        )}
-                                    </td>
+                                    <td>{format(new Date(o.date), 'PPP')}</td>
 
                                     <td>{o.clientID}</td>
                                     <td>{o.orderName}</td>
@@ -589,11 +578,7 @@ export default function ExportInvoice() {
                                     <td>{o.orderPrice}</td>
                                     <td>
                                         {format(
-                                            parse(
-                                                o.orderDeadLine,
-                                                'dd-MMM-yyyy HH:mm:ss',
-                                                new Date()
-                                            ),
+                                            new Date(o.orderDeadLine),
                                             'PPP'
                                         )}
                                     </td>
