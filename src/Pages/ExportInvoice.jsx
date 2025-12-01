@@ -9,6 +9,7 @@ import { ContextData } from '../DataProvider';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format, parse } from 'date-fns';
+import moment from 'moment';
 
 jsPDF.API.autoTable = autoTable;
 
@@ -349,7 +350,7 @@ export default function ExportInvoice() {
 
                 return [
                     i + 1,
-                    format(new Date(o.date), 'PPP'),
+                    o?.date ? moment(o.date).format('DD-MMM-YYYY') : '—',
                     o.orderName,
                     qty,
                     `${currencySymbol}${perImage.toFixed(2)}`,
@@ -570,17 +571,24 @@ export default function ExportInvoice() {
                                             className="checkbox checkbox-sm border-2! border-violet-600!"
                                         />
                                     </td>
-                                    <td>{format(new Date(o.date), 'PPP')}</td>
+                                    <td>
+                                        {o?.date
+                                            ? moment(o.date).format(
+                                                  'DD-MMM-YYYY'
+                                              )
+                                            : '—'}
+                                    </td>
 
                                     <td>{o.clientID}</td>
                                     <td>{o.orderName}</td>
                                     <td>{o.orderQTY}</td>
                                     <td>{o.orderPrice}</td>
                                     <td>
-                                        {format(
-                                            new Date(o.orderDeadLine),
-                                            'PPP'
-                                        )}
+                                        {o?.date
+                                            ? moment(o.orderDeadLine).format(
+                                                  'DD-MMM-YYYY'
+                                              )
+                                            : '—'}
                                     </td>
 
                                     <td>
