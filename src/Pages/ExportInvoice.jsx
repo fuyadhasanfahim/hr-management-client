@@ -8,7 +8,7 @@ import { ContextData } from '../DataProvider';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 jsPDF.API.autoTable = autoTable;
 
@@ -258,7 +258,11 @@ export default function ExportInvoice() {
                 pageWidth - margin - 150,
                 95
             );
-            doc.text(`Date: ${format(exportDate, "PPP")}`, pageWidth - margin - 150, 110);
+            doc.text(
+                `Date: ${format(exportDate, 'PPP')}`,
+                pageWidth - margin - 150,
+                110
+            );
 
             // ===== BILL FROM / BILL TO =====
             const infoY = 135;
@@ -342,9 +346,12 @@ export default function ExportInvoice() {
                 const qty = parseFloat(o.orderQTY) || 0;
                 const total = parseFloat(o.orderPrice) || 0;
                 const perImage = qty > 0 ? total / qty : 0;
+
+                const parsedDate = parse(o.date, 'dd-MMM-yyyy', new Date());
+
                 return [
                     i + 1,
-                    format(o.date, 'PPP'),
+                    format(parsedDate, 'PPP'),
                     o.orderName,
                     qty,
                     `${currencySymbol}${perImage.toFixed(2)}`,
@@ -565,12 +572,32 @@ export default function ExportInvoice() {
                                             className="checkbox checkbox-sm border-2! border-violet-600!"
                                         />
                                     </td>
-                                    <td>{format(o.date, 'PPP')}</td>
+                                    <td>
+                                        {format(
+                                            parse(
+                                                o.date,
+                                                'dd-MMM-yyyy',
+                                                new Date()
+                                            ),
+                                            'PPP'
+                                        )}
+                                    </td>
+
                                     <td>{o.clientID}</td>
                                     <td>{o.orderName}</td>
                                     <td>{o.orderQTY}</td>
                                     <td>{o.orderPrice}</td>
-                                    <td>{format(o.orderDeadLine, 'PPP')}</td>
+                                    <td>
+                                        {format(
+                                            parse(
+                                                o.orderDeadLine,
+                                                'dd-MMM-yyyy HH:mm:ss',
+                                                new Date()
+                                            ),
+                                            'PPP'
+                                        )}
+                                    </td>
+
                                     <td>
                                         <span
                                             className={`badge text-white ${
