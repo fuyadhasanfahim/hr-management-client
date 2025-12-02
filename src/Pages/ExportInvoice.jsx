@@ -8,8 +8,7 @@ import { ContextData } from '../DataProvider';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { format, parse } from 'date-fns';
-import moment from 'moment';
+import { format } from 'date-fns';
 
 jsPDF.API.autoTable = autoTable;
 
@@ -238,11 +237,7 @@ export default function ExportInvoice() {
                 console.warn('⚠️ Logo failed to load.', err);
             }
 
-            const exportDate = new Date().toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-            });
+            const exportDate = new Date();
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(32);
@@ -348,9 +343,14 @@ export default function ExportInvoice() {
                 const total = parseFloat(o.orderPrice) || 0;
                 const perImage = qty > 0 ? total / qty : 0;
 
+                const safeDate =
+                    o?.date && !isNaN(new Date(o.date).getTime())
+                        ? format(new Date(o.date), 'PPP')
+                        : '—';
+
                 return [
                     i + 1,
-                    o?.date ? moment(o.date).format('DD-MMM-YYYY') : '—',
+                    safeDate,
                     o.orderName,
                     qty,
                     `${currencySymbol}${perImage.toFixed(2)}`,
@@ -559,53 +559,68 @@ export default function ExportInvoice() {
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((o) => (
-                                <tr key={o._id}>
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedOrders.includes(
-                                                o._id
-                                            )}
-                                            onChange={() => handleSelect(o._id)}
-                                            className="checkbox checkbox-sm border-2! border-violet-600!"
-                                        />
-                                    </td>
-                                    <td>
-                                        {o?.date
-                                            ? moment(o.date).format(
-                                                  'DD-MMM-YYYY'
-                                              )
-                                            : '—'}
-                                    </td>
+                            {orders.map((o) => {
+                                console.log(o);
+                                return (
+                                    <tr key={o._id}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedOrders.includes(
+                                                    o._id
+                                                )}
+                                                onChange={() =>
+                                                    handleSelect(o._id)
+                                                }
+                                                className="checkbox checkbox-sm border-2! border-violet-600!"
+                                            />
+                                        </td>
+                                        <td>
+                                            {o?.date &&
+                                            !isNaN(new Date(o.date).getTime())
+                                                ? format(
+                                                      new Date(o.date),
+                                                      'PPP'
+                                                  )
+                                                : '—'}
+                                        </td>
 
-                                    <td>{o.clientID}</td>
-                                    <td>{o.orderName}</td>
-                                    <td>{o.orderQTY}</td>
-                                    <td>{o.orderPrice}</td>
-                                    <td>
-                                        {o?.date
-                                            ? moment(o.orderDeadLine).format(
-                                                  'DD-MMM-YYYY'
-                                              )
-                                            : '—'}
-                                    </td>
+                                        <td>{o.clientID}</td>
+                                        <td>{o.orderName}</td>
+                                        <td>{o.orderQTY}</td>
+                                        <td>{o.orderPrice}</td>
+                                        <td>
+                                            {o?.orderDeadLine &&
+                                            !isNaN(
+                                                new Date(
+                                                    o.orderDeadLine
+                                                ).getTime()
+                                            )
+                                                ? format(
+                                                      new Date(o.orderDeadLine),
+                                                      'PPP'
+                                                  )
+                                                : '—'}
+                                        </td>
 
-                                    <td>
-                                        <span
-                                            className={`badge text-white ${
-                                                o.orderStatus === 'Delivered'
-                                                    ? 'badge-success'
-                                                    : o.orderStatus === 'Hold'
-                                                    ? 'badge-warning'
-                                                    : 'badge-info'
-                                            }`}
-                                        >
-                                            {o.orderStatus}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
+                                        <td>
+                                            <span
+                                                className={`badge text-white ${
+                                                    o.orderStatus ===
+                                                    'Delivered'
+                                                        ? 'badge-success'
+                                                        : o.orderStatus ===
+                                                          'Hold'
+                                                        ? 'badge-warning'
+                                                        : 'badge-info'
+                                                }`}
+                                            >
+                                                {o.orderStatus}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

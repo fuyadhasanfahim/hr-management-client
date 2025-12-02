@@ -1,12 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
-import {
-    Search,
-    ChevronDown,
-    Pencil,
-    Trash2, // ⬅️ NEW
-} from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
+import { Search, ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import moment from 'moment';
 import useAxiosProtect from '../../utils/useAxiosProtect';
 import { ContextData } from '../../DataProvider';
 import { useSelector } from 'react-redux';
@@ -15,6 +9,7 @@ import Countdown from 'react-countdown';
 import { BsChevronDoubleLeft, BsChevronDoubleRight } from 'react-icons/bs';
 import EditLocalOrderModal from './EditLocalOrderModal';
 import Swal from 'sweetalert2';
+import { format } from 'date-fns';
 
 const OrderTable = ({ selectedMonth, setSelectedMonth }) => {
     const axiosProtect = useAxiosProtect();
@@ -260,7 +255,7 @@ const OrderTable = ({ selectedMonth, setSelectedMonth }) => {
                 <table className="table table-zebra">
                     <thead className="bg-[#6E3FF3] text-white">
                         <tr>
-                            <th className="w-[12%]">Date</th>
+                            <th>Date</th>
                             <th>Client ID</th>
                             <th>Order Name</th>
                             <th>Order QTY</th>
@@ -295,9 +290,13 @@ const OrderTable = ({ selectedMonth, setSelectedMonth }) => {
                                 return (
                                     <tr key={order._id}>
                                         <td>
-                                            {order?.date
-                                                ? moment(order.date).format(
-                                                      'DD-MMM-YYYY'
+                                            {order?.date &&
+                                            !isNaN(
+                                                new Date(order.date).getTime()
+                                            )
+                                                ? format(
+                                                      new Date(order.date),
+                                                      'PPP'
                                                   )
                                                 : '—'}
                                         </td>
@@ -324,10 +323,9 @@ const OrderTable = ({ selectedMonth, setSelectedMonth }) => {
                                         <td>
                                             {order?.orderDeadLine ? (
                                                 <Countdown
-                                                    date={moment(
-                                                        order.orderDeadLine,
-                                                        'DD-MMM-YYYY HH:mm:ss'
-                                                    ).valueOf()}
+                                                    date={new Date(
+                                                        order.orderDeadLine
+                                                    ).getTime()}
                                                     renderer={({
                                                         days,
                                                         hours,
@@ -475,7 +473,7 @@ const OrderTable = ({ selectedMonth, setSelectedMonth }) => {
                                     }
                                     className={`py-1 px-3 bg-[#6E3FF3] text-white rounded-md hover:bg-yellow-600 cursor-pointer ${
                                         currentPage === page
-                                            ? '!bg-yellow-600'
+                                            ? 'bg-yellow-600!'
                                             : ''
                                     }`}
                                     disabled={typeof page !== 'number'}
