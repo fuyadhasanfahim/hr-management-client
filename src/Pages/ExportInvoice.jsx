@@ -164,8 +164,6 @@ export default function ExportInvoice() {
         fetchInvoiceNumber();
     }, []);
 
-    console.log(invoiceNumber);
-
     const handleExportPDF = async () => {
         if (!selectedOrders.length) {
             toast.warning('No orders selected');
@@ -369,6 +367,11 @@ export default function ExportInvoice() {
                 body: tableRows,
                 theme: 'plain',
                 showHead: 'firstPage',
+                margin: {
+                    left: margin,
+                    right: margin,
+                    bottom: 80,
+                },
                 styles: {
                     fontSize: 9,
                     cellPadding: 8,
@@ -398,7 +401,13 @@ export default function ExportInvoice() {
             const tableEndY = doc.lastAutoTable.finalY;
 
             // ===== TOTAL BLOCK =====
-            const totalY = tableEndY + 25;
+            let totalY = tableEndY + 25;
+
+            if (totalY + 50 > pageHeight - 80) {
+                doc.addPage();
+                totalY = 60;
+            }
+
             const totalBlockWidth = 180;
             const totalBlockHeight = 38;
             const totalBlockX = pageWidth - margin - totalBlockWidth;
