@@ -104,7 +104,7 @@ const Header = () => {
         <div className='mx-auto'>
             <div className='lg:px-8 flex justify-between items-center'>
                 {/**********main-logo*****************/}
-                <img src={logo} alt="WEBBRIKS" className='w-[10%] cursor-pointer' onClick={navigateHome} />
+                <img src={logo} alt="WEBBRIKS" className='h-6 cursor-pointer' onClick={navigateHome} />
                 <section className='flex justify-end items-center gap-3 py-2 w-[300px]'>
 
                     {/*************************message and notifications start*******************************/}

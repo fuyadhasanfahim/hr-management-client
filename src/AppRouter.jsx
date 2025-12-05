@@ -37,6 +37,7 @@ import ExportInvoice from './Pages/ExportInvoice';
 import CreatePassword from './Pages/CreatePassword';
 import CompleteProfile from './Pages/CompleteProfile';
 import SalarySheetPage from './Pages/salary-sheet';
+import Employees from './Pages/employees';
 
 export const router = createBrowserRouter([
     { path: '/login', element: <Login /> },
@@ -63,6 +64,14 @@ export const router = createBrowserRouter([
                 element: (
                     <ProtectedRole>
                         <MyExpense />
+                    </ProtectedRole>
+                ),
+            },
+            {
+                path: '/employees',
+                element: (
+                    <ProtectedRole>
+                        <Employees />
                     </ProtectedRole>
                 ),
             },

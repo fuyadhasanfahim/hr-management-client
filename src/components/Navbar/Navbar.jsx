@@ -1,350 +1,372 @@
-import React, { useContext, useState } from 'react';
-import { BsCurrencyDollar } from 'react-icons/bs';
-import { CiInboxIn } from 'react-icons/ci';
-import { FaAngleDown, FaAngleUp, FaUsers } from 'react-icons/fa';
+import { useContext, useState } from 'react';
+import { FaUsers, FaAngleDown, FaAngleUp } from 'react-icons/fa';
 import {
     FaClipboardUser,
     FaHandHoldingDollar,
     FaSackDollar,
 } from 'react-icons/fa6';
-import { IoAnalyticsSharp, IoCard, IoSettingsOutline } from 'react-icons/io5';
-import { LuCalendarClock, LuUsers } from 'react-icons/lu';
 import { MdOutlineDashboard, MdOutlineShuffle } from 'react-icons/md';
-import { PiClipboardText } from 'react-icons/pi';
 import { RiCurrencyLine, RiUser2Fill } from 'react-icons/ri';
-import { Link, useLocation } from 'react-router-dom';
-import { ContextData } from '../../DataProvider';
+import { IoAnalyticsSharp, IoCard } from 'react-icons/io5';
+import { LuUsers } from 'react-icons/lu';
 import { HiDocumentDuplicate } from 'react-icons/hi2';
 import { FileCheck2Icon, FileSpreadsheet } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ContextData } from '../../DataProvider';
+
+const payrollRoutes = [
+    '/employees',
+    '/shifting',
+    '/appliedLeave',
+    '/salary-sheet',
+];
+
+// ✅ Auto open if any payroll sub route is active
+const isPayrollRouteActive = payrollRoutes.some((path) =>
+    location.pathname.startsWith(path)
+);
 
 const Navbar = () => {
     const { currentUser } = useContext(ContextData);
-
-    const [isOpenGeneral, setIsOpenGeneral] = useState(false);
-    const [isOpenOrder, setIsOpenOrder] = useState(false);
-    const [isOpenOrderManagement, setIsOpenOrderManagement] = useState(false);
-
     const location = useLocation();
-    // ************************************************************************************************
-    const toggleDropdownGeneral = () => {
-        setIsOpenGeneral(!isOpenGeneral);
-    };
-    const toggleDropdownOrder = () => {
-        setIsOpenOrder(!isOpenOrder);
-    };
-    const toggleDropdownOrderManagement = () => {
-        setIsOpenOrderManagement(!isOpenOrderManagement);
-    };
-    // ************************************************************************************************
+
+    const [isPayrollOpen, setIsPayrollOpen] = useState(false);
+
+    const rolesAllowed =
+        currentUser?.role === 'Developer' ||
+        currentUser?.role === 'Admin' ||
+        currentUser?.role === 'HR-ADMIN';
+
+    const activeClass = 'bg-purple-600 text-white shadow-lg';
+    const baseClass =
+        'flex items-center gap-2 px-3 py-2 rounded-md font-medium transition hover:bg-purple-600 hover:text-white';
 
     return (
-        <div className="flex flex-col mb-px">
-            {/* ********************************************************* */}
+        <div className="flex flex-col gap-1 p-2 text-gray-700">
+            {/* ✅ Dashboard */}
             <Link
                 to="/"
-                className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                    location.pathname === '/'
-                        ? 'bg-[#6E3FF3] text-white shadow-md'
-                        : 'hover:bg-[#6E3FF3] hover:text-white'
+                className={`${baseClass} ${
+                    location.pathname === '/' && activeClass
                 }`}
             >
                 <MdOutlineDashboard />
-                <span>Dashboard</span>
+                Dashboard
             </Link>
 
-            {/* ************************************************* ********************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+            {/* ✅✅✅ MODERN PAYROLL DROPDOWN WITH AUTO ACTIVE */}
+            {rolesAllowed && (
+                <div className="mt-3">
+                    <button
+                        onClick={() => setIsPayrollOpen(!isPayrollOpen)}
+                        className={`flex w-full items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all
+            ${
+                isPayrollOpen || isPayrollRouteActive
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-purple-50 text-purple-600 hover:bg-purple-100'
+            }`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <FaHandHoldingDollar className="text-lg" />
+                            Payroll
+                        </span>
+                        <span className="text-sm opacity-80">
+                            {isPayrollOpen || isPayrollRouteActive ? (
+                                <FaAngleUp />
+                            ) : (
+                                <FaAngleDown />
+                            )}
+                        </span>
+                    </button>
+
+                    {/* ✅ SUB MENU */}
+                    <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            isPayrollOpen || isPayrollRouteActive
+                                ? 'max-h-60 opacity-100 my-3'
+                                : 'max-h-0 opacity-0'
+                        }`}
+                    >
+                        <div className="grid grid-cols-1 gap-2 bg-white/80 backdrop-blur-md p-3 rounded-xl border-2 border-purple-200">
+                            {/* ✅ EMPLOYEES */}
+                            <Link
+                                to="/employees"
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                    ${
+                        location.pathname.startsWith('/employees')
+                            ? 'bg-purple-600 text-white shadow'
+                            : 'hover:bg-purple-600 hover:text-white'
+                    }`}
+                            >
+                                <FaUsers
+                                    className={`hover:text-white ${
+                                        location.pathname.startsWith(
+                                            '/employees'
+                                        )
+                                            ? 'text-white'
+                                            : 'text-purple-600'
+                                    }`}
+                                />
+                                <span>Employees</span>
+                            </Link>
+
+                            {/* ✅ SHIFTING */}
+                            <Link
+                                to="/shifting"
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                    ${
+                        location.pathname.startsWith('/shifting')
+                            ? 'bg-purple-600 text-white shadow'
+                            : 'hover:bg-purple-600 hover:text-white'
+                    }`}
+                            >
+                                <MdOutlineShuffle
+                                    className={
+                                        location.pathname.startsWith(
+                                            '/shifting'
+                                        )
+                                            ? 'text-white'
+                                            : 'text-purple-600'
+                                    }
+                                />
+                                <span>Shifting</span>
+                            </Link>
+
+                            {/* ✅ LEAVE */}
+                            <Link
+                                to="/appliedLeave"
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                    ${
+                        location.pathname.startsWith('/appliedLeave')
+                            ? 'bg-purple-600 text-white shadow'
+                            : 'hover:bg-purple-600 hover:text-white'
+                    }`}
+                            >
+                                <HiDocumentDuplicate
+                                    className={
+                                        location.pathname.startsWith(
+                                            '/appliedLeave'
+                                        )
+                                            ? 'text-white'
+                                            : 'text-purple-600'
+                                    }
+                                />
+                                <span>Leave Applications</span>
+                            </Link>
+
+                            {/* ✅ SALARY */}
+                            <Link
+                                to="/salary-sheet"
+                                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
+                    ${
+                        location.pathname.startsWith('/salary-sheet')
+                            ? 'bg-purple-600 text-white shadow'
+                            : 'hover:bg-purple-600 hover:text-white'
+                    }`}
+                            >
+                                <FileSpreadsheet
+                                    size={18}
+                                    className={
+                                        location.pathname.startsWith(
+                                            '/salary-sheet'
+                                        )
+                                            ? 'text-white'
+                                            : 'text-purple-600'
+                                    }
+                                />
+                                <span>Salary Sheet</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ✅ Employee List */}
+            {rolesAllowed && (
                 <Link
                     to="/employeeList"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname.startsWith('/employeeList')
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname.startsWith('/employeeList') &&
+                        activeClass
                     }`}
                 >
                     <LuUsers />
-                    <span>Employee List</span>
+                    Employee List
                 </Link>
             )}
-            {/* ************************************************* ********************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+
+            {/* ✅ Salary Sheet */}
+            {rolesAllowed && (
                 <Link
                     to="/salary-sheet"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname.startsWith('/salary-sheet')
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname.startsWith('/salary-sheet') &&
+                        activeClass
                     }`}
                 >
                     <FileSpreadsheet size={18} />
-                    <span>Salary Sheet</span>
+                    Salary Sheet
                 </Link>
             )}
-            {/* ************************************************* ********************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN' ||
-                currentUser?.role === 'teamLeader') && (
+
+            {/* ✅ Shifting */}
+            {rolesAllowed && (
                 <Link
                     to="/shifting"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/shifting'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/shifting' && activeClass
                     }`}
                 >
                     <MdOutlineShuffle />
-                    <span>Shifting</span>
+                    Shifting
                 </Link>
             )}
-            {/*************************************************************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+
+            {/* ✅ Employee Details */}
+            {rolesAllowed && (
                 <Link
                     to="/employeeDetails"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start
-                    ${
-                        location.pathname === '/employeeDetails'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
-                    } `}
+                    className={`${baseClass} ${
+                        location.pathname === '/employeeDetails' && activeClass
+                    }`}
                 >
                     <FaUsers />
-                    <span>Employee Details</span>
+                    Employee Details
                 </Link>
             )}
-            {/*************************************************************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+
+            {/* ✅ Leave Applications */}
+            {rolesAllowed && (
                 <Link
                     to="/appliedLeave"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start
-                    ${
-                        location.pathname === '/appliedLeave'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
-                    } `}
+                    className={`${baseClass} ${
+                        location.pathname === '/appliedLeave' && activeClass
+                    }`}
                 >
                     <HiDocumentDuplicate />
-                    <span>Leave Applications</span>
+                    Leave Applications
                 </Link>
             )}
 
-            {/* ********************************************************* */}
-
-            {/* <Link
-                to="/expense"
-                className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${location.pathname === '/expense'
-                        ? 'bg-[#6E3FF3] text-white shadow-md'
-                        : 'hover:bg-[#6E3FF3] hover:text-white'
-                    } ${currentUser?.role === 'Developer'? '': 'hidden'}` }
-            >
-                <RiCurrencyLine />
-                <span>Expense</span>
-            </Link> */}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+            {/* ✅ Expense */}
+            {rolesAllowed && (
                 <Link
                     to="/expense"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/expense'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/expense' && activeClass
                     }`}
                 >
                     <RiCurrencyLine />
-                    <span>Expense</span>
+                    Expense
                 </Link>
             )}
 
-            {/* ********************************************************* order management section*/}
-            {/* currently hidden below section */}
-            <section
-                className={`hidden ${
-                    isOpenOrderManagement ? 'bg-gray-100' : ''
-                } rounded-md mb-px`}
-            >
-                <div
-                    className={`flex items-center justify-between cursor-pointer p-2 w-full gap-2 hover:bg-gray-100 mb-px rounded-md ${
-                        isOpenOrderManagement ? 'hover:bg-gray-100' : ''
-                    }`}
-                    onClick={toggleDropdownOrderManagement}
-                >
-                    <div className="flex items-center gap-2">
-                        {/* <FcElectricity className="text-xl" /> */}
-                        <span>Orders</span>
-                    </div>
-                    <span>
-                        {isOpenOrderManagement ? (
-                            <FaAngleUp />
-                        ) : (
-                            <FaAngleDown />
-                        )}
-                    </span>
-                </div>
-
-                {isOpenOrderManagement && (
-                    <div className="rounded-md p-2 bg-gray-100">
-                        {/* ************************************************* */}
-                        <Link
-                            to="/orders"
-                            className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                                location.pathname === '/order-management'
-                                    ? 'bg-[#6E3FF3] text-white shadow-md'
-                                    : 'hover:bg-[#6E3FF3] hover:text-white'
-                            }`}
-                        >
-                            <FileCheck2Icon size={20} />
-                            <span>Order Management</span>
-                        </Link>
-                        {/* ************************************************* */}
-                    </div>
-                )}
-            </section>
-            {/*************************************************************/}
+            {/* ✅ ORDER MANAGEMENT */}
             <Link
                 to="/orders"
-                className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                    location.pathname.startsWith('/orders')
-                        ? 'bg-[#6E3FF3] text-white shadow-md'
-                        : 'hover:bg-[#6E3FF3] hover:text-white'
+                className={`${baseClass} ${
+                    location.pathname.startsWith('/orders') && activeClass
                 }`}
             >
                 <FileCheck2Icon size={18} />
-                <span>Order Management</span>
+                Order Management
             </Link>
-            {/*************************************************************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+
+            {/* ✅ EARNINGS */}
+            {rolesAllowed && (
                 <Link
                     to="/earnings"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start
-                    ${
-                        location.pathname === '/earnings'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
-                    } `}
+                    className={`${baseClass} ${
+                        location.pathname === '/earnings' && activeClass
+                    }`}
                 >
                     <FaHandHoldingDollar />
-                    <span>Earnings</span>
+                    Earnings
                 </Link>
             )}
 
-            {/*************************************************************/}
-            {/* {(currentUser?.role === 'Developer' || currentUser?.role === 'Admin' || currentUser?.role === 'HR-ADMIN') && (
-                <Link
-                    to="/payroll"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start
-                    ${location.pathname === '/payroll'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
-                        } `}
-                >
-                    <BsCurrencyDollar />
-                    <span>Payroll</span>
-                </Link>
-            )} */}
-            {/*************************************************************/}
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+            {/* ✅ CLIENTS */}
+            {rolesAllowed && (
                 <Link
                     to="/clients"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname.startsWith('/clients')
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname.startsWith('/clients') && activeClass
                     }`}
                 >
                     <RiUser2Fill />
-                    <span>Clients</span>
+                    Clients
                 </Link>
             )}
 
-            {/*************************************************************/}
+            {/* ✅ PROFIT SHARE */}
             {(currentUser?.role === 'Developer' ||
                 currentUser?.role === 'Admin') && (
                 <Link
                     to="/profit-share"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/profit-share'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/profit-share' && activeClass
                     }`}
                 >
                     <FaSackDollar />
-                    <span>Profit Share</span>
+                    Profit Share
                 </Link>
             )}
-            {/* ********************************************************* */}
+
+            {/* ✅ ANALYTICS */}
             {(currentUser?.role === 'Developer' ||
                 currentUser?.role === 'Admin') && (
                 <Link
                     to="/analytics"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/analytics'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/analytics' && activeClass
                     }`}
                 >
                     <IoAnalyticsSharp />
-                    <span>Analytics</span>
+                    Analytics
                 </Link>
             )}
+
+            {/* ✅ DEBIT */}
             {(currentUser?.role === 'Developer' ||
                 currentUser?.role === 'Admin') && (
                 <Link
                     to="/debit"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/debit'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/debit' && activeClass
                     }`}
                 >
                     <IoCard />
-                    <span>Debit</span>
+                    Debit
                 </Link>
             )}
-            {/* ********************************************************* */}
 
-            {(currentUser?.role === 'Developer' ||
-                currentUser?.role === 'Admin' ||
-                currentUser?.role === 'HR-ADMIN') && (
+            {/* ✅ NOTICE BOARD (ADMIN) */}
+            {rolesAllowed && (
                 <Link
                     to="/notice-board-admin"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/notice-Board-admin'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/notice-board-admin' &&
+                        activeClass
                     }`}
                 >
                     <FaClipboardUser />
-                    <span>Notice board</span>
+                    Notice Board
                 </Link>
             )}
-            {/* ********************************************************* */}
+
+            {/* ✅ NOTICE BOARD (EMPLOYEE) */}
             {currentUser?.role === 'employee' && (
                 <Link
                     to="/notice-board-employee"
-                    className={`mb-px font-semibold p-2 rounded-md flex gap-2 items-center justify-start ${
-                        location.pathname === '/notice-board-employee'
-                            ? 'bg-[#6E3FF3] text-white shadow-md'
-                            : 'hover:bg-[#6E3FF3] hover:text-white'
+                    className={`${baseClass} ${
+                        location.pathname === '/notice-board-employee' &&
+                        activeClass
                     }`}
                 >
                     <FaClipboardUser />
-                    <span>Notice board</span>
+                    Notice Board
                 </Link>
             )}
-            {/* ********************************************************* */}
         </div>
     );
 };
