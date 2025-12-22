@@ -25,6 +25,12 @@ export default function Shifting() {
     const [OTHours, setOTHours] = useState(0);
     const [selectedBranch, setSelectedBranch] = useState('');
 
+    useEffect(() => {
+        if (currentUser.role === 'teamLeader') {
+            setSelectedBranch(currentUser.branch);
+        }
+    }, [currentUser]);
+
     // ---------- Helpers ----------
     const isDeactivated = (emp) =>
         String(emp?.status || '').toLowerCase() === 'de-activate';

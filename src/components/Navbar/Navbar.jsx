@@ -55,7 +55,7 @@ const Navbar = () => {
             </Link>
 
             {/* ✅✅✅ MODERN PAYROLL DROPDOWN WITH AUTO ACTIVE */}
-            {rolesAllowed && (
+            {/* {rolesAllowed && (
                 <div className="mt-3">
                     <button
                         onClick={() => setIsPayrollOpen(!isPayrollOpen)}
@@ -79,7 +79,6 @@ const Navbar = () => {
                         </span>
                     </button>
 
-                    {/* ✅ SUB MENU */}
                     <div
                         className={`overflow-hidden transition-all duration-300 ease-in-out ${
                             isPayrollOpen || isPayrollRouteActive
@@ -88,7 +87,6 @@ const Navbar = () => {
                         }`}
                     >
                         <div className="grid grid-cols-1 gap-2 bg-white/80 backdrop-blur-md p-3 rounded-xl border-2 border-purple-200">
-                            {/* ✅ EMPLOYEES */}
                             <Link
                                 to="/employees"
                                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
@@ -110,7 +108,6 @@ const Navbar = () => {
                                 <span>Employees</span>
                             </Link>
 
-                            {/* ✅ SHIFTING */}
                             <Link
                                 to="/shifting"
                                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
@@ -132,7 +129,6 @@ const Navbar = () => {
                                 <span>Shifting</span>
                             </Link>
 
-                            {/* ✅ LEAVE */}
                             <Link
                                 to="/appliedLeave"
                                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
@@ -154,7 +150,6 @@ const Navbar = () => {
                                 <span>Leave Applications</span>
                             </Link>
 
-                            {/* ✅ SALARY */}
                             <Link
                                 to="/salary-sheet"
                                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition
@@ -179,7 +174,7 @@ const Navbar = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* ✅ Employee List */}
             {rolesAllowed && (
