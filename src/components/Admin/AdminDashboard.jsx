@@ -176,7 +176,7 @@ const AdminDashboard = () => {
 
     // ===== Render =====
     return (
-        <div className="p-4">
+        <div className="">
             {/* ===== Header Button ===== */}
             <section className="flex justify-end mb-4">
                 <button

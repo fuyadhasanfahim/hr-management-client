@@ -111,16 +111,11 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
         // deadline (stored as "DD-MMM-YYYY HH:mm:ss")
         if (order.orderDeadLine) {
-            let m = moment(order.orderDeadLine, 'DD-MMM-YYYY HH:mm:ss', true);
-            if (!m.isValid()) {
-                m = moment(order.orderDeadLine);
-            }
-
+            const m = moment(order.orderDeadLine, "DD-MMM-YYYY HH:mm:ss");
             if (m.isValid()) {
                 setDeadlineObj({
                     date: m.toDate().toISOString(),
-                    timezoneName:
-                        Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    timezoneName: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 });
             } else {
                 setDeadlineObj(null);
