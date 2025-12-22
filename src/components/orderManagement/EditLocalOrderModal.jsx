@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import DatePicker from "react-datepicker";
-import moment from "moment-timezone";
-import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { setRefetch } from "../../redux/refetchSlice";
-import { ContextData } from "../../DataProvider";
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import moment from 'moment-timezone';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRefetch } from '../../redux/refetchSlice';
+import { ContextData } from '../../DataProvider';
 
-import "react-datepicker/dist/react-datepicker.css";
-import useAxiosProtect from "../../utils/useAxiosProtect";
+import 'react-datepicker/dist/react-datepicker.css';
+import useAxiosProtect from '../../utils/useAxiosProtect';
 
 const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
     const axiosProtect = useAxiosProtect();
@@ -19,12 +19,12 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
     // Basic fields
     const [form, setForm] = useState({
-        clientID: "",
-        orderName: "",
-        orderInstructions: "",
-        returnFormat: "Original Format and BG",
-        colorCode: "",
-        imageResize: "",
+        clientID: '',
+        orderName: '',
+        orderInstructions: '',
+        returnFormat: 'Original Format and BG',
+        colorCode: '',
+        imageResize: '',
     });
 
     // Dates
@@ -39,36 +39,36 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
     // Services
     const [services, setServices] = useState([]);
-    const [customService, setCustomService] = useState("");
+    const [customService, setCustomService] = useState('');
 
     const serviceOptions = useMemo(
         () => [
-            "Clipping path",
-            "Multi clipping path",
-            "Transparent background",
-            "White background",
-            "Color background",
-            "Hair masking",
-            "Single Selection",
-            "Multi Selection",
-            "Drop shadow",
-            "Natural shadow",
-            "Reflection shadow",
-            "Image manipulation",
-            "Neck join",
-            "Ghost mannequin effect",
-            "Basic retouching",
-            "High-end retouching",
-            "Jewelry retouching",
-            "Skin retouching",
-            "Color change",
-            "Color correction",
-            "Image resizing",
-            "Raster to vector",
-            "Lighting adjustment",
-            "White balance",
-            "BG and skin",
-            "custom",
+            'Clipping path',
+            'Multi clipping path',
+            'Transparent background',
+            'White background',
+            'Color background',
+            'Hair masking',
+            'Single Selection',
+            'Multi Selection',
+            'Drop shadow',
+            'Natural shadow',
+            'Reflection shadow',
+            'Image manipulation',
+            'Neck join',
+            'Ghost mannequin effect',
+            'Basic retouching',
+            'High-end retouching',
+            'Jewelry retouching',
+            'Skin retouching',
+            'Color change',
+            'Color correction',
+            'Image resizing',
+            'Raster to vector',
+            'Lighting adjustment',
+            'White balance',
+            'BG and skin',
+            'custom',
         ],
         []
     );
@@ -85,28 +85,46 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
         if (!open || !order) return;
 
         setForm({
-            clientID: order.clientID || "",
-            orderName: order.orderName || "",
-            orderInstructions: order.orderInstructions || "",
-            returnFormat: order.returnFormat || "Original Format and BG",
-            colorCode: order.colorCode || "",
-            imageResize: order.imageResize || "",
+            clientID: order.clientID || '',
+            orderName: order.orderName || '',
+            orderInstructions: order.orderInstructions || '',
+            returnFormat: order.returnFormat || 'Original Format and BG',
+            colorCode: order.colorCode || '',
+            imageResize: order.imageResize || '',
         });
 
         // order date (stored as "DD-MMM-YYYY")
         if (order.date) {
-            setOrderDate(moment(order.date, "DD-MMM-YYYY").toDate());
+            let m = moment(order.date, 'DD-MMM-YYYY', true);
+            if (!m.isValid()) {
+                m = moment(order.date);
+            }
+
+            if (m.isValid()) {
+                setOrderDate(m.toDate());
+            } else {
+                setOrderDate(null);
+            }
         } else {
             setOrderDate(null);
         }
 
         // deadline (stored as "DD-MMM-YYYY HH:mm:ss")
         if (order.orderDeadLine) {
-            const m = moment(order.orderDeadLine, "DD-MMM-YYYY HH:mm:ss");
-            setDeadlineObj({
-                date: m.toDate().toISOString(),
-                timezoneName: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            });
+            let m = moment(order.orderDeadLine, 'DD-MMM-YYYY HH:mm:ss', true);
+            if (!m.isValid()) {
+                m = moment(order.orderDeadLine);
+            }
+
+            if (m.isValid()) {
+                setDeadlineObj({
+                    date: m.toDate().toISOString(),
+                    timezoneName:
+                        Intl.DateTimeFormat().resolvedOptions().timeZone,
+                });
+            } else {
+                setDeadlineObj(null);
+            }
         } else {
             setDeadlineObj(null);
         }
@@ -120,12 +138,15 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
         setLastEdited(null);
 
         // services
-        setServices(Array.isArray(order.needServices) ? order.needServices : []);
-        setCustomService("");
+        setServices(
+            Array.isArray(order.needServices) ? order.needServices : []
+        );
+        setCustomService('');
     }, [open, order]); // eslint-disable-line
 
     // deadline picker helpers
-    const getDeadlineDate = () => (deadlineObj ? new Date(deadlineObj.date) : null);
+    const getDeadlineDate = () =>
+        deadlineObj ? new Date(deadlineObj.date) : null;
     const filterPastTimes = (time) => moment(time).isSameOrAfter(moment());
     const handleDeadlineChange = (date) => {
         const timezoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -136,21 +157,23 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
     const handleServiceChange = (e) => {
         const selected = e.target.value;
         if (!selected) return;
-        if (selected === "custom") {
-            document.getElementById("editCustomServiceModal").showModal();
+        if (selected === 'custom') {
+            document.getElementById('editCustomServiceModal').showModal();
             return;
         }
         if (!services.includes(selected)) {
             setServices((prev) => [...prev, selected]);
-            if (selected === "Color change") document.getElementById("editColorChangeModal").showModal();
-            if (selected === "Image resizing") document.getElementById("editImageResizingModal").showModal();
+            if (selected === 'Color change')
+                document.getElementById('editColorChangeModal').showModal();
+            if (selected === 'Image resizing')
+                document.getElementById('editImageResizingModal').showModal();
         }
     };
 
     const removeService = (s) => {
         setServices((prev) => prev.filter((x) => x !== s));
-        if (s === "Color change") setForm((f) => ({ ...f, colorCode: "" }));
-        if (s === "Image resizing") setForm((f) => ({ ...f, imageResize: "" }));
+        if (s === 'Color change') setForm((f) => ({ ...f, colorCode: '' }));
+        if (s === 'Image resizing') setForm((f) => ({ ...f, imageResize: '' }));
     };
 
     // qty/price coupling
@@ -159,17 +182,17 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
         setOrderQTY(val);
         const qty = toNum(val);
         if (qty <= 0) return;
-        if (lastEdited === "total") {
+        if (lastEdited === 'total') {
             const tp = toNum(totalPrice);
             setImagePrice(qty > 0 ? round2(tp / qty) : 0);
-        } else if (lastEdited === "ppi") {
+        } else if (lastEdited === 'ppi') {
             const ppi = toNum(imagePrice);
             setTotalPrice(round2(ppi * qty));
         }
     };
 
     const handleTotalChange = (e) => {
-        setLastEdited("total");
+        setLastEdited('total');
         const val = e.target.value;
         setTotalPrice(val);
         const qty = toNum(orderQTY);
@@ -178,7 +201,7 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
     };
 
     const handlePPIChange = (e) => {
-        setLastEdited("ppi");
+        setLastEdited('ppi');
         const val = e.target.value;
         setImagePrice(val);
         const qty = toNum(orderQTY);
@@ -191,26 +214,28 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
         e.preventDefault();
         if (!order?._id) return;
         if (
-            ["Completed", "Delivered"].includes(String(order?.orderStatus)) ||
+            ['Completed', 'Delivered'].includes(String(order?.orderStatus)) ||
             order?.isLocked
         ) {
-            toast.error("This order is locked/completed/delivered and cannot be edited.");
+            toast.error(
+                'This order is locked/completed/delivered and cannot be edited.'
+            );
             return;
         }
         try {
             setSubmitting(true);
 
             const selectedDate = orderDate
-                ? moment(orderDate).format("DD-MMM-YYYY")
-                : order?.date || moment().format("DD-MMM-YYYY");
+                ? moment(orderDate).format('DD-MMM-YYYY')
+                : order?.date || moment().format('DD-MMM-YYYY');
 
             const deadlineMoment = deadlineObj
                 ? moment(deadlineObj.date).tz(deadlineObj.timezoneName)
                 : null;
 
             const newDeadline = deadlineMoment
-                ? deadlineMoment.format("DD-MMM-YYYY HH:mm:ss")
-                : "";
+                ? deadlineMoment.format('DD-MMM-YYYY HH:mm:ss')
+                : '';
 
             // EXCLUDES orderStatus & userName (by requirement)
             const payload = {
@@ -233,7 +258,7 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                 { params: { userEmail: user?.email } }
             );
 
-            toast.success(data?.message || "Order updated");
+            toast.success(data?.message || 'Order updated');
             dispatch(setRefetch(!refetch));
             onUpdated?.();
             onClose?.();
@@ -241,7 +266,7 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
             const msg =
                 err?.response?.data?.message ||
                 err?.response?.data?.error ||
-                "Failed to save changes";
+                'Failed to save changes';
             toast.error(msg);
         } finally {
             setSubmitting(false);
@@ -268,7 +293,9 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     {/* Dates */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block font-semibold mb-1">Order Date</label>
+                            <label className="block font-semibold mb-1">
+                                Order Date
+                            </label>
                             <DatePicker
                                 selected={orderDate}
                                 onChange={(d) => setOrderDate(d)}
@@ -278,7 +305,9 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                         </div>
 
                         <div>
-                            <label className="block font-semibold mb-1">Deadline</label>
+                            <label className="block font-semibold mb-1">
+                                Deadline
+                            </label>
                             <DatePicker
                                 selected={getDeadlineDate()}
                                 onChange={handleDeadlineChange}
@@ -294,23 +323,37 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     {/* Basic */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block font-semibold">Client ID</label>
+                            <label className="block font-semibold">
+                                Client ID
+                            </label>
                             <input
                                 type="text"
                                 className="w-full !border !border-gray-300 p-2 rounded"
                                 value={form.clientID}
-                                onChange={(e) => setForm((f) => ({ ...f, clientID: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        clientID: e.target.value,
+                                    }))
+                                }
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block font-semibold">Order Name</label>
+                            <label className="block font-semibold">
+                                Order Name
+                            </label>
                             <input
                                 type="text"
                                 className="w-full !border !border-gray-300 p-2 rounded"
                                 value={form.orderName}
-                                onChange={(e) => setForm((f) => ({ ...f, orderName: e.target.value }))}
+                                onChange={(e) =>
+                                    setForm((f) => ({
+                                        ...f,
+                                        orderName: e.target.value,
+                                    }))
+                                }
                                 required
                             />
                         </div>
@@ -319,7 +362,9 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     {/* Qty/Price */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label className="block font-semibold">Order QTY</label>
+                            <label className="block font-semibold">
+                                Order QTY
+                            </label>
                             <input
                                 type="number"
                                 min="0"
@@ -331,7 +376,9 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                         </div>
 
                         <div>
-                            <label className="block font-semibold">Total Price ($)</label>
+                            <label className="block font-semibold">
+                                Total Price ($)
+                            </label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -344,7 +391,9 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                         </div>
 
                         <div>
-                            <label className="block font-semibold">Price per Image ($)</label>
+                            <label className="block font-semibold">
+                                Price per Image ($)
+                            </label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -358,20 +407,27 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
                     {/* Instructions */}
                     <div>
-                        <label className="block font-semibold">Instructions</label>
+                        <label className="block font-semibold">
+                            Instructions
+                        </label>
                         <textarea
                             rows={3}
                             className="w-full !border !border-gray-300 p-2 rounded"
                             value={form.orderInstructions}
                             onChange={(e) =>
-                                setForm((f) => ({ ...f, orderInstructions: e.target.value }))
+                                setForm((f) => ({
+                                    ...f,
+                                    orderInstructions: e.target.value,
+                                }))
                             }
                         />
                     </div>
 
                     {/* Services & Return */}
                     <div>
-                        <label className="block font-semibold mb-1">Select Services</label>
+                        <label className="block font-semibold mb-1">
+                            Select Services
+                        </label>
                         <select
                             value=""
                             onChange={handleServiceChange}
@@ -405,51 +461,84 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block font-semibold mb-1">Returned File Format</label>
+                                <label className="block font-semibold mb-1">
+                                    Returned File Format
+                                </label>
                                 <select
                                     value={form.returnFormat}
                                     onChange={(e) =>
-                                        setForm((f) => ({ ...f, returnFormat: e.target.value }))
+                                        setForm((f) => ({
+                                            ...f,
+                                            returnFormat: e.target.value,
+                                        }))
                                     }
                                     className="w-full !border !border-gray-300 p-2 rounded"
                                 >
-                                    <option value="Original Format and BG">Original Format and BG</option>
-                                    <option value="JPG - White BG">JPG - White BG</option>
-                                    <option value="PNG - Transparent">PNG - Transparent</option>
-                                    <option value="PSD - Layer Mask">PSD - Layer Mask</option>
-                                    <option value="PSD - Layered File">PSD - Layered File</option>
-                                    <option value="PSD - Original BG">PSD - Original BG</option>
-                                    <option value="TIFF - Original BG">TIFF - Original BG</option>
-                                    <option value="TIFF - Transparent BG">TIFF - Transparent BG</option>
+                                    <option value="Original Format and BG">
+                                        Original Format and BG
+                                    </option>
+                                    <option value="JPG - White BG">
+                                        JPG - White BG
+                                    </option>
+                                    <option value="PNG - Transparent">
+                                        PNG - Transparent
+                                    </option>
+                                    <option value="PSD - Layer Mask">
+                                        PSD - Layer Mask
+                                    </option>
+                                    <option value="PSD - Layered File">
+                                        PSD - Layered File
+                                    </option>
+                                    <option value="PSD - Original BG">
+                                        PSD - Original BG
+                                    </option>
+                                    <option value="TIFF - Original BG">
+                                        TIFF - Original BG
+                                    </option>
+                                    <option value="TIFF - Transparent BG">
+                                        TIFF - Transparent BG
+                                    </option>
                                     <option value="PSF Pages">PSF Pages</option>
-                                    <option value="PSB - Layered file">PSB - Layered file</option>
+                                    <option value="PSB - Layered file">
+                                        PSB - Layered file
+                                    </option>
                                     <option value="PDF">PDF</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label className="block font-semibold mb-1">Color Change Instructions</label>
+                                <label className="block font-semibold mb-1">
+                                    Color Change Instructions
+                                </label>
                                 <textarea
                                     rows={2}
                                     className="w-full !border !border-gray-300 p-2 rounded"
                                     placeholder="e.g., #FF0000 to #00FF00"
                                     value={form.colorCode}
                                     onChange={(e) =>
-                                        setForm((f) => ({ ...f, colorCode: e.target.value }))
+                                        setForm((f) => ({
+                                            ...f,
+                                            colorCode: e.target.value,
+                                        }))
                                     }
                                 />
                             </div>
                         </div>
 
                         <div className="mt-4">
-                            <label className="block font-semibold mb-1">Image Resize Instructions</label>
+                            <label className="block font-semibold mb-1">
+                                Image Resize Instructions
+                            </label>
                             <textarea
                                 rows={2}
                                 className="w-full !border !border-gray-300 p-2 rounded"
                                 placeholder="e.g., 2000x2000px @ 300dpi"
                                 value={form.imageResize}
                                 onChange={(e) =>
-                                    setForm((f) => ({ ...f, imageResize: e.target.value }))
+                                    setForm((f) => ({
+                                        ...f,
+                                        imageResize: e.target.value,
+                                    }))
                                 }
                             />
                         </div>
@@ -457,11 +546,20 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
 
                     {/* Buttons */}
                     <div className="flex justify-end gap-3 pt-2">
-                        <button type="button" className="btn btn-outline" onClick={onClose} disabled={submitting}>
+                        <button
+                            type="button"
+                            className="btn btn-outline"
+                            onClick={onClose}
+                            disabled={submitting}
+                        >
                             Cancel
                         </button>
-                        <button type="submit" className="btn bg-[#6E3FF3] text-white" disabled={submitting}>
-                            {submitting ? "Saving..." : "Save changes"}
+                        <button
+                            type="submit"
+                            className="btn bg-[#6E3FF3] text-white"
+                            disabled={submitting}
+                        >
+                            {submitting ? 'Saving...' : 'Save changes'}
                         </button>
                     </div>
                 </form>
@@ -474,7 +572,7 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     <form method="dialog">
                         <button
                             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                            onClick={() => setCustomService("")}
+                            onClick={() => setCustomService('')}
                         >
                             ✕
                         </button>
@@ -482,11 +580,16 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            if (customService && !services.includes(customService)) {
+                            if (
+                                customService &&
+                                !services.includes(customService)
+                            ) {
                                 setServices((prev) => [...prev, customService]);
                             }
-                            setCustomService("");
-                            document.getElementById("editCustomServiceModal").close();
+                            setCustomService('');
+                            document
+                                .getElementById('editCustomServiceModal')
+                                .close();
                         }}
                         className="mt-4"
                     >
@@ -497,7 +600,10 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                             className="w-full border p-2 rounded"
                             required
                         />
-                        <button type="submit" className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded">
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded"
+                        >
                             Add
                         </button>
                     </form>
@@ -509,16 +615,20 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     <form method="dialog">
                         <button
                             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                            onClick={() => removeService("Color change")}
+                            onClick={() => removeService('Color change')}
                         >
                             ✕
                         </button>
                     </form>
-                    <h3 className="text-lg font-bold">Color Change Instructions</h3>
+                    <h3 className="text-lg font-bold">
+                        Color Change Instructions
+                    </h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            document.getElementById("editColorChangeModal").close();
+                            document
+                                .getElementById('editColorChangeModal')
+                                .close();
                         }}
                         className="mt-4"
                     >
@@ -527,10 +637,16 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                             className="w-full border p-2 rounded"
                             value={form.colorCode}
                             onChange={(e) =>
-                                setForm((f) => ({ ...f, colorCode: e.target.value }))
+                                setForm((f) => ({
+                                    ...f,
+                                    colorCode: e.target.value,
+                                }))
                             }
                         />
-                        <button type="submit" className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded">
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded"
+                        >
                             Save
                         </button>
                     </form>
@@ -542,16 +658,20 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                     <form method="dialog">
                         <button
                             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                            onClick={() => removeService("Image resizing")}
+                            onClick={() => removeService('Image resizing')}
                         >
                             ✕
                         </button>
                     </form>
-                    <h3 className="text-lg font-bold">Image Resize Instructions</h3>
+                    <h3 className="text-lg font-bold">
+                        Image Resize Instructions
+                    </h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            document.getElementById("editImageResizingModal").close();
+                            document
+                                .getElementById('editImageResizingModal')
+                                .close();
                         }}
                         className="mt-4"
                     >
@@ -560,10 +680,16 @@ const EditLocalOrderModal = ({ open, order, onClose, onUpdated }) => {
                             className="w-full border p-2 rounded"
                             value={form.imageResize}
                             onChange={(e) =>
-                                setForm((f) => ({ ...f, imageResize: e.target.value }))
+                                setForm((f) => ({
+                                    ...f,
+                                    imageResize: e.target.value,
+                                }))
                             }
                         />
-                        <button type="submit" className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded">
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 text-white mt-3 px-3 py-1 rounded"
+                        >
                             Save
                         </button>
                     </form>
